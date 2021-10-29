@@ -9,13 +9,19 @@ public class ExceptionMessageHandler {
 
     public static final String TAG_CODE = "02";
 
+    public static final String USER_CODE = "03";
+
     public static final String CERTIFICATE_ID_NOT_PRESENT_MESSAGE_NAME = "message.certificate-id-empty";
 
     public static final String TAG_ID_NOT_PRESENT_MESSAGE_NAME = "message.tag-id-empty";
 
+    public static final String USER_ID_NOT_PRESENT_MESSAGE_NAME = "message.user-id-empty";
+
     public static final String CERTIFICATE_NOT_FOUND_MESSAGE_NAME = "message.certificate-not-found";
 
     public static final String TAG_NOT_FOUND_MESSAGE_NAME = "message.tag-not-found";
+
+    public static final String USER_NOT_FOUND_MESSAGE_NAME = "message.user-not-found";
 
     public static final String SOURCE_NAME = "local";
 

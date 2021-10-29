@@ -65,6 +65,41 @@ public final class ConstantQuery {
             "ORDER BY CASE WHEN sortParam = 'name' THEN gift_certificates.name END, " +
             "CASE WHEN sortParam = 'create-date' THEN gift_certificates.create_date END ASC";
 
+    public static final String FIND_CERTIFICATE_BY_TAGS_QUERY = "SELECT gift_certificates.id, " +
+            "gift_certificates.name, gift_certificates.description, " +
+            "gift_certificates.price, gift_certificates.duration, gift_certificates.create_date, " +
+            "gift_certificates.last_update_date FROM rest_api.gift_certificates " +
+            "INNER JOIN rest_api.certificate_tag_maps " +
+            "ON rest_api.certificate_tag_maps.gift_certificate_id = rest_api.gift_certificates.id " +
+            "INNER JOIN rest_api.tags ON rest_api.certificate_tag_maps.tag_id = rest_api.tags.id " +
+            "WHERE rest_api.tags.name IN (?, ?) GROUP BY rest_api.gift_certificates.id " +
+            "HAVING COUNT(DISTINCT rest_api.tags.id) = 2";
+
+    public static final String FIND_POPULAR_TAG_QUERY = "SELECT rest_api.tags.id, rest_api.tags.name " +
+            "FROM rest_api.tags \n" +
+            "INNER JOIN rest_api.certificate_tag_maps ON rest_api.tags.id = rest_api.certificate_tag_maps.tag_id \n" +
+            "INNER JOIN rest_api.orders " +
+            "ON rest_api.orders.certificate_id = rest_api.certificate_tag_maps.gift_certificate_id \n" +
+            "WHERE rest_api.orders.user_id = ?\n" +
+            "GROUP BY rest_api.tags.id, rest_api.orders.total_cost \n" +
+            "HAVING rest_api.orders.total_cost = MAX(rest_api.orders.total_cost)\n" +
+            "ORDER BY COUNT(rest_api.tags.id) LIMIT 1";
+
+    public static final String FIND_USER_QUERY = "SELECT * FROM users WHERE id = ?";
+
+    public static final String FIND_ALL_USERS_QUERY = "SELECT * FROM users LIMIT COALESCE(?, 3) OFFSET COALESCE(?, 0)";
+
+    public static final String ADD_CERTIFICATE_TO_USER_QUERY = "INSERT INTO " +
+            "orders (certificate_id, purchase_timestamp, total_cost, user_id) VALUES (?, ?, ?, ?)";
+
+    public static final String FIND_USER_ORDER_QUERY = "SELECT " +
+            "orders.id, orders.purchase_timestamp, orders.total_cost " +
+            "FROM orders WHERE id = ? AND user_id = ?";
+
+    public static final String FIND_ALL_USER_ORDERS_QUERY = "SELECT " +
+            "orders.id, orders.purchase_timestamp, orders.total_cost " +
+            "FROM orders WHERE user_id = ?";
+
     public static final String PERCENT_VALUE = "%";
 
     public static final String TAG_ID_COLUMN_NAME = "id";
