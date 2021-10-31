@@ -1,4 +1,4 @@
-package com.epam.esm.core;
+package com.epam.esm.controller;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

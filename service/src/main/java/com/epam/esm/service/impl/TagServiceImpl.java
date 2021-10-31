@@ -39,8 +39,17 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<Tag> findAll() {
-        return tagDao.findAll();
+    public List<Tag> findAll(Integer limit, Integer offset) {
+        return tagDao.findAll(limit, offset);
+    }
+
+    @Override
+    public Tag findPopularTag(Long userId) throws ParameterNotPresentException {
+        if (userId == null) {
+            throw new ParameterNotPresentException(ExceptionMessageHandler.USER_CODE,
+                    ExceptionMessageHandler.USER_ID_NOT_PRESENT_MESSAGE_NAME);
+        }
+        return tagDao.findPopularTag(userId);
     }
 
     @Override

@@ -39,9 +39,18 @@ public class TagDaoImpl implements TagDao {
     }
 
     @Override
-    public List<Tag> findAll() {
+    public List<Tag> findAll(Integer limit, Integer offset) {
         return jdbcTemplate.query(ConstantQuery.FIND_ALL_TAGS_QUERY,
-                new BeanPropertyRowMapper<>(Tag.class));
+                new BeanPropertyRowMapper<>(Tag.class), limit, offset);
+    }
+
+    @Override
+    public Tag findPopularTag(Long userId) {
+        return jdbcTemplate.query(ConstantQuery.FIND_POPULAR_TAG_QUERY,
+                new BeanPropertyRowMapper<>(Tag.class), userId)
+                .stream()
+                .findAny()
+                .orElse(null);
     }
 
     @Transactional

@@ -2,16 +2,19 @@ package com.epam.esm.dao.configuration;
 
 import com.epam.esm.dao.GiftCertificateDao;
 import com.epam.esm.dao.TagDao;
+import com.epam.esm.dao.UserDao;
 import com.epam.esm.dao.impl.GiftCertificateDaoImpl;
 import com.epam.esm.dao.impl.TagDaoImpl;
+import com.epam.esm.dao.impl.UserDaoImpl;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-@Configuration
+@TestConfiguration
 @PropertySource(value = {"classpath:application-test.properties"})
 public class TestDataSourceConfiguration {
 
@@ -58,6 +61,11 @@ public class TestDataSourceConfiguration {
     @Bean
     public TagDao createTagDao() {
         return new TagDaoImpl(createJdbcTemplate());
+    }
+
+    @Bean
+    public UserDao createUserDao() {
+        return new UserDaoImpl(createJdbcTemplate());
     }
 
 }

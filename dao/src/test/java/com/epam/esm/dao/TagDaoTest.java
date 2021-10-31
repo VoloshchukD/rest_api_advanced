@@ -36,7 +36,7 @@ public class TagDaoTest {
 
     @Test
     public void testFindAllTags() {
-        Assertions.assertNotNull(tagDao.findAll());
+        Assertions.assertNotNull(tagDao.findAll(3, 0));
     }
 
     @Test
@@ -64,6 +64,11 @@ public class TagDaoTest {
     @Test
     public void testDeleteTagFromCertificate() {
         Assertions.assertTrue(tagDao.deleteTagFromCertificate(3L, 4L));
+    }
+
+    @Test
+    public void testFindPopularTag() {
+        Assertions.assertNotNull(tagDao.findPopularTag(1L));
     }
 
 }

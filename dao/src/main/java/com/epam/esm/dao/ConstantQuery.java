@@ -7,7 +7,8 @@ public final class ConstantQuery {
 
     public static final String FIND_GIFT_CERTIFICATE_QUERY = "SELECT * FROM gift_certificates WHERE id = ?";
 
-    public static final String FIND_ALL_GIFT_CERTIFICATES_QUERY = "SELECT * FROM gift_certificates";
+    public static final String FIND_ALL_GIFT_CERTIFICATES_QUERY = "SELECT * FROM gift_certificates " +
+            "LIMIT COALESCE(?, 3) OFFSET COALESCE(?, 0)";
 
     public static final String UPDATE_GIFT_CERTIFICATE_QUERY = "UPDATE gift_certificates " +
             "SET name = COALESCE(?, name), description = COALESCE(?, description), " +
@@ -21,7 +22,7 @@ public final class ConstantQuery {
 
     public static final String FIND_TAG_QUERY = "SELECT * FROM tags WHERE id = ?";
 
-    public static final String FIND_ALL_TAGS_QUERY = "SELECT * FROM tags";
+    public static final String FIND_ALL_TAGS_QUERY = "SELECT * FROM tags LIMIT COALESCE(?, 3) OFFSET COALESCE(?, 0)";
 
     public static final String UPDATE_TAG_QUERY = "UPDATE tags SET name = COALESCE(?, name) WHERE id = ?";
 
@@ -54,7 +55,8 @@ public final class ConstantQuery {
             "ON certificate_tag_maps.gift_certificate_id = gift_certificates.id " +
             "INNER JOIN tags ON certificate_tag_maps.tag_id = tags.id " +
             "WHERE gift_certificates.name LIKE COALESCE(?, gift_certificates.name) " +
-            "AND gift_certificates.description LIKE COALESCE(?, gift_certificates.description)";
+            "AND gift_certificates.description LIKE COALESCE(?, gift_certificates.description) " +
+            "LIMIT COALESCE(?, 3) OFFSET COALESCE(?, 0)";
 
     public static final String FIND_SORTED_CERTIFICATES_QUERY = "WITH constants (sortParam) AS (values (?))\n" +
             "SELECT gift_certificates.id, gift_certificates.name, gift_certificates.description, " +
@@ -63,7 +65,8 @@ public final class ConstantQuery {
             "INNER JOIN certificate_tag_maps ON certificate_tag_maps.gift_certificate_id = gift_certificates.id " +
             "INNER JOIN tags ON certificate_tag_maps.tag_id = tags.id " +
             "ORDER BY CASE WHEN sortParam = 'name' THEN gift_certificates.name END, " +
-            "CASE WHEN sortParam = 'create-date' THEN gift_certificates.create_date END ASC";
+            "CASE WHEN sortParam = 'create-date' THEN gift_certificates.create_date END ASC " +
+            "LIMIT COALESCE(?, 3) OFFSET COALESCE(?, 0)";
 
     public static final String FIND_CERTIFICATE_BY_TAGS_QUERY = "SELECT gift_certificates.id, " +
             "gift_certificates.name, gift_certificates.description, " +
@@ -73,17 +76,15 @@ public final class ConstantQuery {
             "ON rest_api.certificate_tag_maps.gift_certificate_id = rest_api.gift_certificates.id " +
             "INNER JOIN rest_api.tags ON rest_api.certificate_tag_maps.tag_id = rest_api.tags.id " +
             "WHERE rest_api.tags.name IN (?, ?) GROUP BY rest_api.gift_certificates.id " +
-            "HAVING COUNT(DISTINCT rest_api.tags.id) = 2";
+            "HAVING COUNT(DISTINCT rest_api.tags.id) = 2 LIMIT COALESCE(?, 3) OFFSET COALESCE(?, 0)";
 
-    public static final String FIND_POPULAR_TAG_QUERY = "SELECT rest_api.tags.id, rest_api.tags.name " +
-            "FROM rest_api.tags \n" +
-            "INNER JOIN rest_api.certificate_tag_maps ON rest_api.tags.id = rest_api.certificate_tag_maps.tag_id \n" +
+    public static final String FIND_POPULAR_TAG_QUERY = "SELECT tags.id, tags.name FROM tags " +
+            "INNER JOIN rest_api.certificate_tag_maps " +
+            "ON rest_api.tags.id = rest_api.certificate_tag_maps.tag_id " +
             "INNER JOIN rest_api.orders " +
-            "ON rest_api.orders.certificate_id = rest_api.certificate_tag_maps.gift_certificate_id \n" +
-            "WHERE rest_api.orders.user_id = ?\n" +
-            "GROUP BY rest_api.tags.id, rest_api.orders.total_cost \n" +
-            "HAVING rest_api.orders.total_cost = MAX(rest_api.orders.total_cost)\n" +
-            "ORDER BY COUNT(rest_api.tags.id) LIMIT 1";
+            "ON rest_api.orders.certificate_id = rest_api.certificate_tag_maps.gift_certificate_id " +
+            "WHERE rest_api.orders.user_id = ? GROUP BY rest_api.tags.id " +
+            "ORDER BY SUM(rest_api.orders.total_cost) DESC, COUNT(*) DESC LIMIT 1";
 
     public static final String FIND_USER_QUERY = "SELECT * FROM users WHERE id = ?";
 
@@ -98,7 +99,7 @@ public final class ConstantQuery {
 
     public static final String FIND_ALL_USER_ORDERS_QUERY = "SELECT " +
             "orders.id, orders.purchase_timestamp, orders.total_cost " +
-            "FROM orders WHERE user_id = ?";
+            "FROM orders WHERE user_id = ? LIMIT COALESCE(?, 3) OFFSET COALESCE(?, 0)";
 
     public static final String PERCENT_VALUE = "%";
 

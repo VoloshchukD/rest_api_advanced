@@ -49,8 +49,8 @@ public class TagServiceTest {
 
     @Test
     public void testFindAllTags() {
-        Mockito.when(tagDao.findAll()).thenReturn(Collections.singletonList(tag));
-        Assertions.assertNotNull(tagService.findAll());
+        Mockito.when(tagDao.findAll(3, 0)).thenReturn(Collections.singletonList(tag));
+        Assertions.assertNotNull(tagService.findAll(3, 0));
     }
 
     @Test
@@ -63,6 +63,12 @@ public class TagServiceTest {
     public void testDeleteTagFromCertificate() throws ParameterNotPresentException {
         Mockito.when(tagDao.deleteTagFromCertificate(1L, 1L)).thenReturn(true);
         Assertions.assertTrue(tagService.deleteTagFromCertificate(1L, 1L));
+    }
+
+    @Test
+    public void testFindPopularTag() throws ParameterNotPresentException {
+        Mockito.when(tagDao.findPopularTag(1L)).thenReturn(tag);
+        Assertions.assertNotNull(tagService.findPopularTag(1L));
     }
 
 }

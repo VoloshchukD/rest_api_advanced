@@ -42,7 +42,7 @@ public class GiftCertificateDaoTest {
 
     @Test
     public void testFindAllCertificates() {
-        Assertions.assertNotNull(giftCertificateDao.findAll());
+        Assertions.assertNotNull(giftCertificateDao.findAll(3, 0));
     }
 
     @Test
@@ -64,12 +64,23 @@ public class GiftCertificateDaoTest {
 
     @Test
     public void testFindByNameAndDescription() {
-        Assertions.assertNotNull(giftCertificateDao.findByNameAndDescription("qwer", "qwer"));
+        Assertions.assertNotNull(
+                giftCertificateDao.findByNameAndDescription("qwer", "qwer", 3, 0));
     }
 
     @Test
     public void testFindSorted() {
-        Assertions.assertNotNull(giftCertificateDao.findSorted("name"));
+        Assertions.assertNotNull(giftCertificateDao.findSorted("name", 3, 0));
+    }
+
+    @Test
+    public void testAddCertificateToUser() {
+        Assertions.assertTrue(giftCertificateDao.addCertificateToUser(giftCertificate, 1L, new Date()));
+    }
+
+    @Test
+    public void testFindCertificatesByTags() {
+        Assertions.assertNotNull(giftCertificateDao.findCertificatesByTags(3, 0, "Tom", "Bob"));
     }
 
 }

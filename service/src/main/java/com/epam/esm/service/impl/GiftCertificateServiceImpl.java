@@ -30,6 +30,21 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
+    public boolean addCertificateToUser(Long certificateId, Long userId) throws ParameterNotPresentException {
+        if (certificateId == null) {
+            throw new ParameterNotPresentException(ExceptionMessageHandler.CERTIFICATE_CODE,
+                    ExceptionMessageHandler.CERTIFICATE_ID_NOT_PRESENT_MESSAGE_NAME);
+        }
+        if (userId == null) {
+            throw new ParameterNotPresentException(ExceptionMessageHandler.USER_CODE,
+                    ExceptionMessageHandler.USER_ID_NOT_PRESENT_MESSAGE_NAME);
+        }
+        GiftCertificate certificate = giftCertificateDao.find(certificateId);
+        Date purchaseTimestamp = new Date();
+        return giftCertificateDao.addCertificateToUser(certificate, userId, purchaseTimestamp);
+    }
+
+    @Override
     public GiftCertificate find(Long id) throws ParameterNotPresentException, DataNotFoundException {
         if (id == null) {
             throw new ParameterNotPresentException(ExceptionMessageHandler.CERTIFICATE_CODE,
@@ -44,8 +59,13 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificate> findAll() {
-        return giftCertificateDao.findAll();
+    public List<GiftCertificate> findAll(Integer limit, Integer offset) {
+        return giftCertificateDao.findAll(limit, offset);
+    }
+
+    @Override
+    public List<GiftCertificate> findCertificatesByTags(Integer limit, Integer offset, String... tagNames) {
+        return giftCertificateDao.findCertificatesByTags(limit, offset, tagNames);
     }
 
     @Override
@@ -78,13 +98,15 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificate> findByNameAndDescription(String name, String description) {
-        return giftCertificateDao.findByNameAndDescription(name, description);
+    public List<GiftCertificate> findByNameAndDescription(String name, String description, Integer limit,
+                                                          Integer offset) {
+        return giftCertificateDao.findByNameAndDescription(name, description, limit, offset);
     }
 
     @Override
-    public List<GiftCertificate> findSorted(String sortingParameter, boolean descending) {
-        List<GiftCertificate> sortedCertificates = giftCertificateDao.findSorted(sortingParameter);
+    public List<GiftCertificate> findSorted(String sortingParameter, boolean descending, Integer limit,
+                                            Integer offset) {
+        List<GiftCertificate> sortedCertificates = giftCertificateDao.findSorted(sortingParameter, limit, offset);
         if (descending) {
             Collections.reverse(sortedCertificates);
         }

@@ -1,11 +1,12 @@
 package com.epam.esm.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Date;
 import java.util.Objects;
 
-public class GiftCertificate {
+public class GiftCertificate extends RepresentationModel<GiftCertificate> {
 
     private Long id;
 

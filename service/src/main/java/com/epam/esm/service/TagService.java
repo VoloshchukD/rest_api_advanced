@@ -31,6 +31,8 @@ public interface TagService extends BaseService<Tag> {
      */
     boolean addTagToCertificate(Tag tag, Long certificateId) throws ParameterNotPresentException;
 
+    Tag findPopularTag(Long userId) throws ParameterNotPresentException;
+
     /**
      * Method with unbinding logics for {@link Tag} and {@link GiftCertificate} data.
      *

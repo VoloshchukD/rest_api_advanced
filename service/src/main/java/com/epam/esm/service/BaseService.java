@@ -35,7 +35,7 @@ public interface BaseService<T> {
      *
      * @return list of all founded entities
      */
-    List<T> findAll();
+    List<T> findAll(Integer limit, Integer offset);
 
     /**
      * Method with entity data refresh.

@@ -55,8 +55,8 @@ public class GiftCertificateServiceTest {
 
     @Test
     public void testFindAllGiftCertificates() {
-        Mockito.when(giftCertificateDao.findAll()).thenReturn(Collections.singletonList(giftCertificate));
-        Assertions.assertNotNull(giftCertificateService.findAll());
+        Mockito.when(giftCertificateDao.findAll(3, 0)).thenReturn(Collections.singletonList(giftCertificate));
+        Assertions.assertNotNull(giftCertificateService.findAll(3, 0));
     }
 
     @Test
@@ -70,17 +70,25 @@ public class GiftCertificateServiceTest {
     public void testFindByNameAndDescription() {
         String name = "qwerty";
         String description = "qwerty";
-        Mockito.when(giftCertificateDao.findByNameAndDescription(name, description)).thenReturn(
+        Mockito.when(giftCertificateDao.findByNameAndDescription(name, description, 3, 0)).thenReturn(
                 Collections.singletonList(giftCertificate));
-        Assertions.assertNotNull(giftCertificateService.findByNameAndDescription(name, description));
+        Assertions.assertNotNull(giftCertificateService.findByNameAndDescription(name, description, 3, 0));
     }
 
     @Test
     public void testFindSorted() {
         String sortingParameter = "name";
-        Mockito.when(giftCertificateDao.findSorted(sortingParameter)).thenReturn(
+        Mockito.when(giftCertificateDao.findSorted(sortingParameter, 3, 0)).thenReturn(
                 Collections.singletonList(giftCertificate));
-        Assertions.assertNotNull(giftCertificateService.findSorted(sortingParameter, false));
+        Assertions.assertNotNull(giftCertificateService.findSorted(sortingParameter, false, 3, 0));
+    }
+
+    @Test
+    public void testFindCertificatesByTags() {
+        Mockito.when(giftCertificateDao.findCertificatesByTags(3, 0, "John", "Wick")).thenReturn(
+                Collections.singletonList(giftCertificate));
+        Assertions.assertNotNull(
+                giftCertificateService.findCertificatesByTags(3, 0, "John", "Wick"));
     }
 
 }

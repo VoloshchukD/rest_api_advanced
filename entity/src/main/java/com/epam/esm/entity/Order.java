@@ -1,9 +1,11 @@
 package com.epam.esm.entity;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import java.util.Date;
 import java.util.Objects;
 
-public class Order {
+public class Order extends RepresentationModel<Order> {
 
     private Long id;
 

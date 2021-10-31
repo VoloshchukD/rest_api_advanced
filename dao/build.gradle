@@ -15,9 +15,6 @@ dependencies {
     implementation 'org.springframework:spring-jdbc:5.3.9'
     implementation 'org.postgresql:postgresql:42.2.23'
     testImplementation 'com.h2database:h2:1.4.200'
-    testImplementation 'org.springframework:spring-test:5.3.9'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
 }
 
 test {

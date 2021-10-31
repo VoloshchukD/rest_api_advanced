@@ -8,6 +8,8 @@ public interface TagDao extends BaseDao<Tag> {
 
     boolean addTagToCertificate(Tag tag, Long certificateId);
 
+    Tag findPopularTag(Long userId);
+
     boolean deleteTagFromCertificate(Long certificateId, Long tagId);
 
 }
