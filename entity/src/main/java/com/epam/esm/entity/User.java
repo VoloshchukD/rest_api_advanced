@@ -2,14 +2,22 @@ package com.epam.esm.entity;
 
 import org.springframework.hateoas.RepresentationModel;
 
+import javax.persistence.*;
 import java.util.Objects;
 
+@Entity
+@Table(name = "users")
 public class User extends RepresentationModel<User> {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
     private Long id;
 
+    @Column
     private String forename;
 
+    @Column
     private String surname;
 
     public Long getId() {

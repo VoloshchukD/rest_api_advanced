@@ -1,14 +1,28 @@
 package com.epam.esm.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.hateoas.RepresentationModel;
 
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "tags")
+@JsonIgnoreProperties(value = {"certificates"})
 public class Tag extends RepresentationModel<Tag> {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
     private Long id;
 
+    @Column
     private String name;
+
+    @ManyToMany(mappedBy = "tags")
+    private List<GiftCertificate> certificates = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -26,24 +40,34 @@ public class Tag extends RepresentationModel<Tag> {
         this.name = name;
     }
 
+    public List<GiftCertificate> getCertificates() {
+        return certificates;
+    }
+
+    public void setCertificates(List<GiftCertificate> certificates) {
+        this.certificates = certificates;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         Tag tag = (Tag) o;
-        return Objects.equals(id, tag.id) && Objects.equals(name, tag.name);
+        return Objects.equals(id, tag.id) && Objects.equals(name, tag.name)
+                && Objects.equals(certificates, tag.certificates);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(super.hashCode(), id, name, certificates);
     }
 
     @Override
     public String toString() {
         return "Tag{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
+                ", name='" + name +
                 '}';
     }
 

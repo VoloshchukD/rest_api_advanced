@@ -67,7 +67,8 @@ public class TagController {
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Tag> deleteTag(@PathVariable("id") Long id) throws ParameterNotPresentException {
+    public ResponseEntity<Boolean> deleteTag(@PathVariable("id") Long id)
+            throws ParameterNotPresentException, DataNotFoundException {
         boolean result = tagService.delete(id);
         HttpStatus httpStatus = result ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
         return new ResponseEntity(result, httpStatus);

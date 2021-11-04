@@ -66,10 +66,15 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public boolean delete(Long id) throws ParameterNotPresentException {
+    public boolean delete(Long id) throws ParameterNotPresentException, DataNotFoundException {
         if (id == null) {
             throw new ParameterNotPresentException(ExceptionMessageHandler.TAG_CODE,
                     ExceptionMessageHandler.TAG_ID_NOT_PRESENT_MESSAGE_NAME);
+        }
+        Tag tag = tagDao.find(id);
+        if (tag == null) {
+            throw new DataNotFoundException(ExceptionMessageHandler.TAG_CODE,
+                    ExceptionMessageHandler.TAG_NOT_FOUND_MESSAGE_NAME);
         }
         return tagDao.delete(id);
     }

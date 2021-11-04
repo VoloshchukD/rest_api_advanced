@@ -1,26 +1,51 @@
 package com.epam.esm.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.hateoas.RepresentationModel;
 
+import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "gift_certificates")
+@JsonIgnoreProperties(value = {"tags", "orders"})
 public class GiftCertificate extends RepresentationModel<GiftCertificate> {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
     private Long id;
 
+    @Column
     private String name;
 
+    @Column
     private String description;
 
+    @Column
     private Integer price;
 
+    @Column
     private Integer duration;
 
+    @Column(name = "create_date")
     private Date createDate;
 
+    @Column(name = "last_update_date")
     private Date lastUpdateDate;
+
+    @ManyToMany(cascade = CascadeType.MERGE)
+    @JoinTable(name = "certificate_tag_maps", joinColumns = @JoinColumn(name = "gift_certificate_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    private List<Tag> tags = new ArrayList<>();
+
+    @OneToMany
+    @JoinColumn(name = "certificate_id")
+    private List<Order> orders = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -80,20 +105,39 @@ public class GiftCertificate extends RepresentationModel<GiftCertificate> {
         this.lastUpdateDate = lastUpdateDate;
     }
 
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         GiftCertificate that = (GiftCertificate) o;
         return Objects.equals(id, that.id) && Objects.equals(name, that.name)
                 && Objects.equals(description, that.description) && Objects.equals(price, that.price)
                 && Objects.equals(duration, that.duration) && Objects.equals(createDate, that.createDate)
-                && Objects.equals(lastUpdateDate, that.lastUpdateDate);
+                && Objects.equals(lastUpdateDate, that.lastUpdateDate) && Objects.equals(tags, that.tags)
+                && Objects.equals(orders, that.orders);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, price, duration, createDate, lastUpdateDate);
+        return Objects.hash(super.hashCode(), id, name, description, price,
+                duration, createDate, lastUpdateDate, tags, orders);
     }
 
     @Override

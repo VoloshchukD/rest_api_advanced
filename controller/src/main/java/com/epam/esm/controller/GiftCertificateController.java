@@ -54,8 +54,8 @@ public class GiftCertificateController {
     public List<GiftCertificate> findGiftCertificates(@RequestParam("limit") Integer limit,
                                                       @RequestParam("offset") Integer offset)
             throws ParameterNotPresentException, DataNotFoundException {
-        List<GiftCertificate> certificates = new ArrayList<>();
-        for (GiftCertificate certificate : certificates){
+        List<GiftCertificate> certificates = giftCertificateService.findAll(limit, offset);
+        for (GiftCertificate certificate : certificates) {
             certificate.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(GiftCertificateController.class)
                     .findGiftCertificate(certificate.getId()))
                     .withSelfRel());
@@ -93,7 +93,7 @@ public class GiftCertificateController {
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<GiftCertificate> deleteGiftCertificate(
-            @PathVariable("id") Long id) throws ParameterNotPresentException {
+            @PathVariable("id") Long id) throws ParameterNotPresentException, DataNotFoundException {
         boolean result = giftCertificateService.delete(id);
         HttpStatus httpStatus = result ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
         return new ResponseEntity(result, httpStatus);
@@ -108,8 +108,8 @@ public class GiftCertificateController {
     @GetMapping(params = {"tagNames", "limit", "offset"})
     @ResponseStatus(HttpStatus.OK)
     public List<GiftCertificate> findCertificatesByTags(@RequestParam("tagNames") List<String> tagNames,
-                                                       @RequestParam("limit") Integer limit,
-                                                       @RequestParam("offset") Integer offset) {
+                                                        @RequestParam("limit") Integer limit,
+                                                        @RequestParam("offset") Integer offset) {
         String[] tagNamesArray = new String[tagNames.size()];
         return giftCertificateService.findCertificatesByTags(limit, offset, tagNames.toArray(tagNamesArray));
     }
@@ -123,7 +123,7 @@ public class GiftCertificateController {
             throws ParameterNotPresentException, DataNotFoundException {
         List<GiftCertificate> certificates = giftCertificateService.findByNameAndDescription(name,
                 description, limit, offset);
-        for (GiftCertificate certificate : certificates){
+        for (GiftCertificate certificate : certificates) {
             certificate.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(GiftCertificateController.class)
                     .findGiftCertificate(certificate.getId()))
                     .withSelfRel());
@@ -134,7 +134,7 @@ public class GiftCertificateController {
         return certificates;
     }
 
-    @GetMapping(params = {"sort", "descending", "limit", "offset"})
+    @GetMapping(params = {"sortingParameter", "descending", "limit", "offset"})
     @ResponseStatus(HttpStatus.OK)
     public List<GiftCertificate> findSorted(@RequestParam("sortingParameter") String sortingParameter,
                                             @RequestParam("descending") boolean descending,
@@ -143,7 +143,7 @@ public class GiftCertificateController {
             throws ParameterNotPresentException, DataNotFoundException {
         List<GiftCertificate> certificates = giftCertificateService.findSorted(sortingParameter,
                 descending, limit, offset);
-        for (GiftCertificate certificate : certificates){
+        for (GiftCertificate certificate : certificates) {
             certificate.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(GiftCertificateController.class)
                     .findGiftCertificate(certificate.getId()))
                     .withSelfRel());

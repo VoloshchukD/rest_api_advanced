@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean add(User user) {
-        return userDao.add(user);
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -46,12 +46,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(User user) {
-        return userDao.update(user);
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean delete(Long id) {
-        return userDao.delete(id);
+        throw new UnsupportedOperationException();
     }
 
     @Override

@@ -2,16 +2,33 @@ package com.epam.esm.entity;
 
 import org.springframework.hateoas.RepresentationModel;
 
+import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
 
+@Entity
+@Table(name = "orders")
 public class Order extends RepresentationModel<Order> {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
     private Long id;
 
+    @Column(name = "purchase_timestamp")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date purchaseTimestamp;
 
+    @Column(name = "total_cost")
     private Integer totalCost;
+
+    @OneToOne
+    @JoinColumn(name = "certificate_id")
+    private GiftCertificate certificate;
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Long getId() {
         return id;
@@ -37,18 +54,36 @@ public class Order extends RepresentationModel<Order> {
         this.totalCost = totalCost;
     }
 
+    public GiftCertificate getCertificate() {
+        return certificate;
+    }
+
+    public void setCertificate(GiftCertificate certificate) {
+        this.certificate = certificate;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         Order order = (Order) o;
         return Objects.equals(id, order.id) && Objects.equals(purchaseTimestamp, order.purchaseTimestamp)
-                && Objects.equals(totalCost, order.totalCost);
+                && Objects.equals(totalCost, order.totalCost) && Objects.equals(certificate, order.certificate)
+                && Objects.equals(user, order.user);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, purchaseTimestamp, totalCost);
+        return Objects.hash(super.hashCode(), id, purchaseTimestamp, totalCost, certificate, user);
     }
 
     @Override

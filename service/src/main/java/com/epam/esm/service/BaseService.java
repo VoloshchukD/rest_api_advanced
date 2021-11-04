@@ -53,7 +53,8 @@ public interface BaseService<T> {
      * @param id - identifier of target entity
      * @return boolean result of deletion
      * @throws {@link ParameterNotPresentException}
+     * @throws {@link DataNotFoundException}
      */
-    boolean delete(Long id) throws ParameterNotPresentException;
+    boolean delete(Long id) throws ParameterNotPresentException, DataNotFoundException;
 
 }
