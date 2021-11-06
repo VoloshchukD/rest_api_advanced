@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface GiftCertificateDao extends BaseDao<GiftCertificate> {
 
-    boolean addCertificateToUser(GiftCertificate certificate, Long userId, Date purchaseTimestamp);
+    boolean addCertificateToUser(GiftCertificate certificate, Long userId);
 
-    GiftCertificate findByTagName(String tagName);
+    List<GiftCertificate> findByTagName(String tagName);
 
     List<GiftCertificate> findCertificatesByTags(Integer limit, Integer offset, String... tagNames);
 

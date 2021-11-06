@@ -10,9 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -29,13 +27,12 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Transactional
     @Override
-    public boolean addCertificateToUser(GiftCertificate certificate, Long userId, Date purchaseTimestamp) {
+    public boolean addCertificateToUser(GiftCertificate certificate, Long userId) {
         Order order = new Order();
         User user = new User();
         user.setId(userId);
         order.setUser(user);
         order.setCertificate(certificate);
-        order.setPurchaseTimestamp(purchaseTimestamp);
         order.setTotalCost(certificate.getPrice());
         return (entityManager.merge(order) != null);
     }
@@ -55,16 +52,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     @Transactional
     @Override
     public GiftCertificate update(GiftCertificate giftCertificate) {
-        Query query = entityManager.createQuery(ConstantQuery.UPDATE_GIFT_CERTIFICATE_QUERY);
-        int affectedRowNumber
-                = query.setParameter(ConstantQuery.CERTIFICATE_NAME_PARAMETER_NAME, giftCertificate.getName())
-                .setParameter(ConstantQuery.CERTIFICATE_DESCRIPTION_PARAMETER_NAME, giftCertificate.getDescription())
-                .setParameter(ConstantQuery.CERTIFICATE_PRICE_PARAMETER_NAME, giftCertificate.getPrice())
-                .setParameter(ConstantQuery.CERTIFICATE_DURATION_PARAMETER_NAME, giftCertificate.getDuration())
-                .setParameter(ConstantQuery.CERTIFICATE_UPDATE_DATE_PARAMETER_NAME, giftCertificate.getLastUpdateDate())
-                .setParameter(ConstantQuery.CERTIFICATE_ID_PARAMETER_NAME, giftCertificate.getId())
-                .executeUpdate();
-        return (affectedRowNumber == 1) ? giftCertificate : null;
+        return entityManager.merge(giftCertificate);
     }
 
     @Transactional
@@ -80,11 +68,10 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public GiftCertificate findByTagName(String tagName) {
+    public List<GiftCertificate> findByTagName(String tagName) {
         TypedQuery<GiftCertificate> query = entityManager.createQuery(ConstantQuery.FIND_CERTIFICATE_BY_TAG_NAME_QUERY,
                 GiftCertificate.class);
-        return query.setParameter(ConstantQuery.TAG_NAME_PARAMETER_NAME, tagName)
-                .setMaxResults(ConstantQuery.SINGLE_LIMIT_VALUE).getSingleResult();
+        return query.setParameter(ConstantQuery.TAG_NAME_PARAMETER_NAME, tagName).getResultList();
     }
 
     @Override
@@ -111,8 +98,8 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     public List<GiftCertificate> findCertificatesByTags(Integer limit, Integer offset, String... tagNames) {
         TypedQuery<GiftCertificate> query = entityManager.createQuery(
                 ConstantQuery.FIND_CERTIFICATE_BY_TAGS_QUERY, GiftCertificate.class);
-        return query.setParameter(ConstantQuery.CERTIFICATE_NAME_PARAMETER_NAME, tagNames[1])
-                .setParameter(ConstantQuery.ANOTHER_TAG_NAME_PARAMETER_NAME, tagNames[0])
+        return query.setParameter(ConstantQuery.ZERO_INDEX, tagNames[ConstantQuery.ZERO_INDEX])
+                .setParameter(ConstantQuery.ONE_INDEX, tagNames[ConstantQuery.ONE_INDEX])
                 .setFirstResult(offset).setMaxResults(limit).getResultList();
     }
 

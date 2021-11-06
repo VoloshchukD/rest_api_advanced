@@ -29,6 +29,8 @@ public class ExceptionMessageHandler {
 
     public static final String ORDER_NOT_FOUND_MESSAGE_NAME = "message.order-not-found";
 
+    public static final String INVALID_PAGE_MESSAGE_NAME = "message.invalid-page";
+
     public static final String SOURCE_NAME = "local";
 
     public static String getMessageForLocale(String messageKey, Locale locale) {

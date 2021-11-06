@@ -2,6 +2,7 @@ package com.epam.esm.service;
 
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.service.exception.IllegalPageNumberException;
 import com.epam.esm.service.exception.ParameterNotPresentException;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public interface GiftCertificateService extends BaseService<GiftCertificate> {
      * @param tagName - target certificate identifier
      * @return {@link GiftCertificate} containing required data
      */
-    GiftCertificate findByTagName(String tagName);
+    List<GiftCertificate> findByTagName(String tagName);
 
     /**
      * Method for seeking {@link GiftCertificate}s by part of its name and description.
@@ -30,7 +31,8 @@ public interface GiftCertificateService extends BaseService<GiftCertificate> {
      * @param description - required description part
      * @return list of {@link GiftCertificate} matching search condition
      */
-    List<GiftCertificate> findByNameAndDescription(String name, String description, Integer limit, Integer offset);
+    List<GiftCertificate> findByNameAndDescription(String name, String description, Integer page)
+            throws IllegalPageNumberException;
 
     /**
      * Method for receiving sorted {@link GiftCertificate}s.
@@ -39,8 +41,9 @@ public interface GiftCertificateService extends BaseService<GiftCertificate> {
      * @param descending       - required ordering type
      * @return ordered list of {@link GiftCertificate}
      */
-    List<GiftCertificate> findSorted(String sortingParameter, boolean descending, Integer limit, Integer offset);
+    List<GiftCertificate> findSorted(String sortingParameter, boolean descending, Integer page)
+            throws IllegalPageNumberException;
 
-    List<GiftCertificate> findCertificatesByTags(Integer limit, Integer offset, String... tagNames);
+    List<GiftCertificate> findCertificatesByTags(Integer page, String... tagNames) throws IllegalPageNumberException;
 
 }

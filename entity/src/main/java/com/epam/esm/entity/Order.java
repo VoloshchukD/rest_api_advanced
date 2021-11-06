@@ -1,5 +1,6 @@
 package com.epam.esm.entity;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
@@ -8,13 +9,14 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "orders")
-public class Order extends RepresentationModel<Order> {
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private Long id;
 
+    @CreatedDate
     @Column(name = "purchase_timestamp")
     @Temporal(TemporalType.TIMESTAMP)
     private Date purchaseTimestamp;

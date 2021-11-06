@@ -2,7 +2,9 @@ package com.epam.esm.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.springframework.hateoas.RepresentationModel;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -13,7 +15,8 @@ import java.util.Objects;
 @Entity
 @Table(name = "gift_certificates")
 @JsonIgnoreProperties(value = {"tags", "orders"})
-public class GiftCertificate extends RepresentationModel<GiftCertificate> {
+@EntityListeners(AuditingEntityListener.class)
+public class GiftCertificate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,9 +35,11 @@ public class GiftCertificate extends RepresentationModel<GiftCertificate> {
     @Column
     private Integer duration;
 
+    @CreatedDate
     @Column(name = "create_date")
     private Date createDate;
 
+    @LastModifiedDate
     @Column(name = "last_update_date")
     private Date lastUpdateDate;
 

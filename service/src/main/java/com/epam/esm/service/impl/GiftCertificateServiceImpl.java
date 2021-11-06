@@ -4,12 +4,13 @@ import com.epam.esm.dao.GiftCertificateDao;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.exception.DataNotFoundException;
+import com.epam.esm.service.exception.IllegalPageNumberException;
 import com.epam.esm.service.exception.ParameterNotPresentException;
 import com.epam.esm.service.util.ExceptionMessageHandler;
+import com.epam.esm.service.util.PaginationLogics;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -23,9 +24,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public boolean add(GiftCertificate certificate) {
-        Date currentDate = new Date();
-        certificate.setCreateDate(currentDate);
-        certificate.setLastUpdateDate(currentDate);
         return giftCertificateDao.add(certificate);
     }
 
@@ -40,8 +38,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                     ExceptionMessageHandler.USER_ID_NOT_PRESENT_MESSAGE_NAME);
         }
         GiftCertificate certificate = giftCertificateDao.find(certificateId);
-        Date purchaseTimestamp = new Date();
-        return giftCertificateDao.addCertificateToUser(certificate, userId, purchaseTimestamp);
+        return giftCertificateDao.addCertificateToUser(certificate, userId);
     }
 
     @Override
@@ -59,28 +56,38 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificate> findAll(Integer limit, Integer offset) {
-        return giftCertificateDao.findAll(limit, offset);
+    public List<GiftCertificate> findAll(Integer page) throws IllegalPageNumberException {
+        return giftCertificateDao.findAll(PaginationLogics.DEFAULT_LIMIT, PaginationLogics.convertToOffset(page));
     }
 
     @Override
-    public List<GiftCertificate> findCertificatesByTags(Integer limit, Integer offset, String... tagNames) {
-        return giftCertificateDao.findCertificatesByTags(limit, offset, tagNames);
+    public List<GiftCertificate> findCertificatesByTags(Integer page, String... tagNames)
+            throws IllegalPageNumberException {
+        return giftCertificateDao.findCertificatesByTags(PaginationLogics.DEFAULT_LIMIT,
+                PaginationLogics.convertToOffset(page), tagNames);
     }
 
     @Override
     public GiftCertificate update(GiftCertificate certificate)
             throws ParameterNotPresentException, DataNotFoundException {
-        if (certificate.getId() == null) {
-            throw new ParameterNotPresentException(ExceptionMessageHandler.CERTIFICATE_CODE,
-                    ExceptionMessageHandler.CERTIFICATE_ID_NOT_PRESENT_MESSAGE_NAME);
+        GiftCertificate forUpdate = find(certificate.getId());
+        setUpdateData(certificate, forUpdate);
+        return giftCertificateDao.update(forUpdate);
+    }
+
+    private void setUpdateData(GiftCertificate data, GiftCertificate target) {
+        if (data.getName() != null) {
+            target.setName(data.getName());
         }
-        certificate.setLastUpdateDate(new Date());
-        GiftCertificate updated = giftCertificateDao.update(certificate);
-        if (updated != null) {
-            updated = find(certificate.getId());
+        if (data.getDescription() != null) {
+            target.setDescription(data.getDescription());
         }
-        return updated;
+        if (data.getPrice() != null) {
+            target.setPrice(data.getPrice());
+        }
+        if (data.getDuration() != null) {
+            target.setDuration(data.getDuration());
+        }
     }
 
     @Override
@@ -98,20 +105,22 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public GiftCertificate findByTagName(String tagName) {
+    public List<GiftCertificate> findByTagName(String tagName) {
         return giftCertificateDao.findByTagName(tagName);
     }
 
     @Override
-    public List<GiftCertificate> findByNameAndDescription(String name, String description, Integer limit,
-                                                          Integer offset) {
-        return giftCertificateDao.findByNameAndDescription(name, description, limit, offset);
+    public List<GiftCertificate> findByNameAndDescription(String name, String description, Integer page)
+            throws IllegalPageNumberException {
+        return giftCertificateDao.findByNameAndDescription(name, description, PaginationLogics.DEFAULT_LIMIT,
+                PaginationLogics.convertToOffset(page));
     }
 
     @Override
-    public List<GiftCertificate> findSorted(String sortingParameter, boolean descending, Integer limit,
-                                            Integer offset) {
-        List<GiftCertificate> sortedCertificates = giftCertificateDao.findSorted(sortingParameter, limit, offset);
+    public List<GiftCertificate> findSorted(String sortingParameter, boolean descending, Integer page)
+            throws IllegalPageNumberException {
+        List<GiftCertificate> sortedCertificates = giftCertificateDao.findSorted(sortingParameter,
+                PaginationLogics.DEFAULT_LIMIT, PaginationLogics.convertToOffset(page));
         if (descending) {
             Collections.reverse(sortedCertificates);
         }

@@ -5,8 +5,10 @@ import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.service.UserService;
 import com.epam.esm.service.exception.DataNotFoundException;
+import com.epam.esm.service.exception.IllegalPageNumberException;
 import com.epam.esm.service.exception.ParameterNotPresentException;
 import com.epam.esm.service.util.ExceptionMessageHandler;
+import com.epam.esm.service.util.PaginationLogics;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,8 +42,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findAll(Integer limit, Integer offset) {
-        return userDao.findAll(limit, offset);
+    public List<User> findAll(Integer page) throws IllegalPageNumberException {
+        return userDao.findAll(PaginationLogics.DEFAULT_LIMIT, PaginationLogics.convertToOffset(page));
     }
 
     @Override
@@ -68,12 +70,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Order> findUserOrders(Long userId, Integer limit, Integer offset) throws ParameterNotPresentException {
+    public List<Order> findUserOrders(Long userId, Integer page)
+            throws ParameterNotPresentException, IllegalPageNumberException {
         if (userId == null) {
             throw new ParameterNotPresentException(ExceptionMessageHandler.USER_CODE,
                     ExceptionMessageHandler.USER_ID_NOT_PRESENT_MESSAGE_NAME);
         }
-        return userDao.findUserOrders(userId, limit, offset);
+        return userDao.findUserOrders(userId, PaginationLogics.DEFAULT_LIMIT, PaginationLogics.convertToOffset(page));
     }
 
 }

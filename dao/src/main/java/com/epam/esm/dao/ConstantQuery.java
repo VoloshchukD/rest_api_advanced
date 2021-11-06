@@ -9,11 +9,8 @@ public final class ConstantQuery {
 
     public static final String FIND_ALL_GIFT_CERTIFICATES_QUERY = "SELECT c FROM GiftCertificate c";
 
-    public static final String UPDATE_GIFT_CERTIFICATE_QUERY = "UPDATE GiftCertificate " +
-            "SET name = COALESCE(:name, name), description = COALESCE(:description, description), " +
-            "price = COALESCE(:price, price), duration = COALESCE(:duration, duration), " +
-            "lastUpdateDate = COALESCE(:last_update_date, lastUpdateDate) " +
-            "WHERE id = :certificate_id";
+    public static final String UPDATE_GIFT_CERTIFICATE_QUERY = "UPDATE GiftCertificate SET name = :name, " +
+            "description = :description, price = :price, duration = :duration WHERE id = :certificate_id";
 
     public static final String DELETE_GIFT_CERTIFICATE_QUERY = "DELETE FROM GiftCertificate WHERE id = :certificate_id";
 
@@ -40,21 +37,21 @@ public final class ConstantQuery {
             = "DELETE FROM CertificateTagMap c WHERE c.certificate.id = :certificate_id";
 
     public static final String FIND_CERTIFICATE_BY_TAG_NAME_QUERY = "SELECT " +
-            "g FROM GiftCertificate g JOIN g.tags t " +
-            "WHERE t.name = COALESCE(:name, t.name)";
+            "g FROM GiftCertificate g JOIN g.tags t WHERE t.name = :name";
 
     public static final String FIND_CERTIFICATES_BY_PART_OF_NAME_AND_DESCRIPTION_QUERY = "SELECT DISTINCT g " +
             "FROM GiftCertificate g JOIN g.tags t " +
             "WHERE g.name LIKE COALESCE(:name, g.name) " +
             "AND g.description LIKE COALESCE(:description, g.description)";
 
-    public static final String FIND_SORTED_CERTIFICATES_QUERY = "SELECT g FROM GiftCertificate g JOIN g.tags t " +
+    public static final String FIND_SORTED_CERTIFICATES_QUERY = "SELECT g " +
+            "FROM GiftCertificate g JOIN g.tags t GROUP BY g.id " +
             "ORDER BY CASE WHEN :sorting_parameter = 'name' THEN g.name END, " +
             "CASE WHEN :sorting_parameter = 'create-date' THEN g.createDate END";
 
     public static final String FIND_CERTIFICATE_BY_TAGS_QUERY = "SELECT DISTINCT g FROM GiftCertificate g " +
-            "JOIN g.tags t WHERE t.name = :name AND g.id IN (SELECT DISTINCT g.id " +
-            "FROM GiftCertificate g JOIN g.tags t WHERE t.name = :another_name)";
+            "JOIN g.tags t WHERE t.name = ?0 AND g.id IN (SELECT DISTINCT g.id " +
+            "FROM GiftCertificate g JOIN g.tags t WHERE t.name = ?1)";
 
     public static final String FIND_POPULAR_TAG_QUERY = "SELECT t FROM Tag t JOIN t.certificates c JOIN c.orders o " +
             "WHERE o.user.id = :user_id GROUP BY t.id ORDER BY SUM(o.totalCost) DESC, COUNT(t) DESC";
@@ -99,6 +96,10 @@ public final class ConstantQuery {
     public static final String SORTING_PARAMETER_NAME = "sorting_parameter";
 
     public static final String ANOTHER_TAG_NAME_PARAMETER_NAME = "another_name";
+
+    public static final Integer ZERO_INDEX = 0;
+
+    public static final Integer ONE_INDEX = 1;
 
     private ConstantQuery() {
     }

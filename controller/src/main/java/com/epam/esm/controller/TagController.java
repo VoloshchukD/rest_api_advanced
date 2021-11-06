@@ -1,11 +1,12 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.controller.util.CustomLinkBuilder;
+import com.epam.esm.controller.util.assembler.TagModelAssembler;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.exception.DataNotFoundException;
+import com.epam.esm.service.exception.IllegalPageNumberException;
 import com.epam.esm.service.exception.ParameterNotPresentException;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,37 +19,26 @@ public class TagController {
 
     private TagService tagService;
 
-    public TagController(TagService tagService) {
+    private TagModelAssembler tagModelAssembler;
+
+    public TagController(TagService tagService, TagModelAssembler tagModelAssembler) {
         this.tagService = tagService;
+        this.tagModelAssembler = tagModelAssembler;
     }
 
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Tag findTag(@PathVariable("id") Long id)
+    public EntityModel<Tag> findTag(@PathVariable("id") Long id)
             throws ParameterNotPresentException, DataNotFoundException {
         Tag tag = tagService.find(id);
-        tag.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TagController.class).findTag(tag.getId()))
-                .withSelfRel());
-        tag.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TagController.class)
-                .findTags(CustomLinkBuilder.limit, CustomLinkBuilder.offset))
-                .withRel(CustomLinkBuilder.TAG_RELATION_NAME));
-        tag.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TagController.class)
-                .deleteTag(tag.getId())).withRel(CustomLinkBuilder.TAG_RELATION_NAME));
-        return tag;
+        return tagModelAssembler.toModel(tag);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Tag> findTags(@RequestParam Integer limit, @RequestParam Integer offset)
-            throws ParameterNotPresentException, DataNotFoundException {
-        List<Tag> tags = tagService.findAll(limit, offset);
-        for (Tag tag : tags) {
-            tag.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TagController.class).findTag(tag.getId()))
-                    .withSelfRel());
-            tag.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TagController.class)
-                    .deleteTag(tag.getId())).withRel(CustomLinkBuilder.TAG_RELATION_NAME));
-        }
-        return tags;
+    public List<EntityModel<Tag>> findTags(@RequestParam Integer page) throws IllegalPageNumberException {
+        List<Tag> tags = tagService.findAll(page);
+        return tagModelAssembler.toCollectionModel(tags);
     }
 
     @PostMapping
@@ -102,8 +92,8 @@ public class TagController {
 
     @GetMapping(value = "/popular", params = {"userId"})
     @ResponseStatus(HttpStatus.OK)
-    public Tag findPopularTag(@RequestParam("userId") Long userId) throws ParameterNotPresentException {
-        return tagService.findPopularTag(userId);
+    public EntityModel<Tag> findPopularTag(@RequestParam("userId") Long userId) throws ParameterNotPresentException {
+        return tagModelAssembler.toModel(tagService.findPopularTag(userId));
     }
 
 }

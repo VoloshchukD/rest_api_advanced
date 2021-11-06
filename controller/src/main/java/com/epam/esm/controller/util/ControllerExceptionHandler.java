@@ -2,6 +2,7 @@ package com.epam.esm.controller.util;
 
 import com.epam.esm.entity.dto.ErrorData;
 import com.epam.esm.service.exception.DataNotFoundException;
+import com.epam.esm.service.exception.IllegalPageNumberException;
 import com.epam.esm.service.exception.ParameterNotPresentException;
 import com.epam.esm.service.exception.ServiceException;
 import com.epam.esm.service.util.ExceptionMessageHandler;
@@ -28,6 +29,17 @@ public class ControllerExceptionHandler {
                                                                  WebRequest request) {
         HttpStatus status = HttpStatus.NOT_FOUND;
         return handleException(exception, request, status);
+    }
+
+    @ExceptionHandler(IllegalPageNumberException.class)
+    protected ResponseEntity<Object> handleDataNotFoundException(IllegalPageNumberException exception,
+                                                                 WebRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String messageName = ExceptionMessageHandler.getMessageForLocale(exception.getMessage(),
+                request.getLocale());
+        log.error(messageName, exception);
+        ErrorData errorData = new ErrorData(messageName, String.valueOf(status.value()));
+        return new ResponseEntity<>(errorData, status);
     }
 
     private ResponseEntity<Object> handleException(ServiceException exception, WebRequest request,

@@ -1,6 +1,7 @@
 package com.epam.esm.service;
 
 import com.epam.esm.service.exception.DataNotFoundException;
+import com.epam.esm.service.exception.IllegalPageNumberException;
 import com.epam.esm.service.exception.ParameterNotPresentException;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public interface BaseService<T> {
      *
      * @return list of all founded entities
      */
-    List<T> findAll(Integer limit, Integer offset);
+    List<T> findAll(Integer page) throws IllegalPageNumberException;
 
     /**
      * Method with entity data refresh.

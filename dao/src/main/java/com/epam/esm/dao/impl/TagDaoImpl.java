@@ -46,13 +46,10 @@ public class TagDaoImpl implements TagDao {
                 .setMaxResults(ConstantQuery.SINGLE_LIMIT_VALUE).getSingleResult();
     }
 
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Tag update(Tag tag) {
-        Query query = entityManager.createQuery(ConstantQuery.UPDATE_TAG_QUERY);
-        int affectedRowNumber = query.setParameter(ConstantQuery.TAG_NAME_PARAMETER_NAME, tag.getName())
-                .setParameter(ConstantQuery.TAG_ID_COLUMN_NAME, tag.getId()).executeUpdate();
-        return (affectedRowNumber == 1) ? tag : null;
+        return entityManager.merge(tag);
     }
 
     @Transactional

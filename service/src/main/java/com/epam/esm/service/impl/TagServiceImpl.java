@@ -4,8 +4,10 @@ import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.exception.DataNotFoundException;
+import com.epam.esm.service.exception.IllegalPageNumberException;
 import com.epam.esm.service.exception.ParameterNotPresentException;
 import com.epam.esm.service.util.ExceptionMessageHandler;
+import com.epam.esm.service.util.PaginationLogics;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,8 +41,8 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<Tag> findAll(Integer limit, Integer offset) {
-        return tagDao.findAll(limit, offset);
+    public List<Tag> findAll(Integer page) throws IllegalPageNumberException {
+        return tagDao.findAll(PaginationLogics.DEFAULT_LIMIT, PaginationLogics.convertToOffset(page));
     }
 
     @Override
@@ -54,15 +56,15 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Tag update(Tag tag) throws ParameterNotPresentException, DataNotFoundException {
-        if (tag.getId() == null) {
-            throw new ParameterNotPresentException(ExceptionMessageHandler.TAG_CODE,
-                    ExceptionMessageHandler.TAG_ID_NOT_PRESENT_MESSAGE_NAME);
+        Tag forUpdate = find(tag.getId());
+        setUpdateData(tag, forUpdate);
+        return tagDao.update(forUpdate);
+    }
+
+    private void setUpdateData(Tag data, Tag target) {
+        if (data.getName() != null) {
+            target.setName(data.getName());
         }
-        Tag updated = tagDao.update(tag);
-        if (updated != null) {
-            updated = find(tag.getId());
-        }
-        return updated;
     }
 
     @Override

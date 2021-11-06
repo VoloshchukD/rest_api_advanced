@@ -1,25 +1,16 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.controller.util.CustomLinkBuilder;
+import com.epam.esm.controller.util.assembler.GiftCertificateModelAssembler;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.exception.DataNotFoundException;
+import com.epam.esm.service.exception.IllegalPageNumberException;
 import com.epam.esm.service.exception.ParameterNotPresentException;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -28,42 +19,28 @@ public class GiftCertificateController {
 
     private GiftCertificateService giftCertificateService;
 
-    public GiftCertificateController(GiftCertificateService giftCertificateService) {
+    private GiftCertificateModelAssembler certificateModelAssembler;
+
+    public GiftCertificateController(GiftCertificateService giftCertificateService,
+                                     GiftCertificateModelAssembler certificateModelAssembler) {
         this.giftCertificateService = giftCertificateService;
+        this.certificateModelAssembler = certificateModelAssembler;
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public GiftCertificate findGiftCertificate(@PathVariable("id") Long id)
+    public EntityModel<GiftCertificate> findGiftCertificate(@PathVariable("id") Long id)
             throws ParameterNotPresentException, DataNotFoundException {
         GiftCertificate certificate = giftCertificateService.find(id);
-        certificate.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(GiftCertificateController.class)
-                .findGiftCertificate(certificate.getId()))
-                .withSelfRel());
-        certificate.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(GiftCertificateController.class)
-                .findGiftCertificates(CustomLinkBuilder.limit, CustomLinkBuilder.offset))
-                .withRel(CustomLinkBuilder.CERTIFICATE_RELATION_NAME));
-        certificate.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(GiftCertificateController.class)
-                .deleteGiftCertificate(certificate.getId()))
-                .withRel(CustomLinkBuilder.CERTIFICATE_RELATION_NAME));
-        return certificate;
+        return certificateModelAssembler.toModel(certificate);
     }
 
-    @GetMapping(params = {"limit", "offset"})
+    @GetMapping(params = {"page"})
     @ResponseStatus(HttpStatus.OK)
-    public List<GiftCertificate> findGiftCertificates(@RequestParam("limit") Integer limit,
-                                                      @RequestParam("offset") Integer offset)
-            throws ParameterNotPresentException, DataNotFoundException {
-        List<GiftCertificate> certificates = giftCertificateService.findAll(limit, offset);
-        for (GiftCertificate certificate : certificates) {
-            certificate.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(GiftCertificateController.class)
-                    .findGiftCertificate(certificate.getId()))
-                    .withSelfRel());
-            certificate.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(GiftCertificateController.class)
-                    .deleteGiftCertificate(certificate.getId()))
-                    .withRel(CustomLinkBuilder.CERTIFICATE_RELATION_NAME));
-        }
-        return certificates;
+    public List<EntityModel<GiftCertificate>> findGiftCertificates(@RequestParam("page") Integer page)
+            throws IllegalPageNumberException {
+        List<GiftCertificate> certificates = giftCertificateService.findAll(page);
+        return certificateModelAssembler.toCollectionModel(certificates);
     }
 
     @PostMapping
@@ -92,8 +69,8 @@ public class GiftCertificateController {
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<GiftCertificate> deleteGiftCertificate(
-            @PathVariable("id") Long id) throws ParameterNotPresentException, DataNotFoundException {
+    public ResponseEntity<GiftCertificate> deleteGiftCertificate(@PathVariable("id") Long id)
+            throws ParameterNotPresentException, DataNotFoundException {
         boolean result = giftCertificateService.delete(id);
         HttpStatus httpStatus = result ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
         return new ResponseEntity(result, httpStatus);
@@ -101,57 +78,39 @@ public class GiftCertificateController {
 
     @GetMapping(params = {"tagName"})
     @ResponseStatus(HttpStatus.OK)
-    public GiftCertificate findGiftCertificateByTagName(@RequestParam("tagName") String tagName) {
-        return giftCertificateService.findByTagName(tagName);
+    public List<EntityModel<GiftCertificate>> findGiftCertificateByTagName(@RequestParam("tagName") String tagName) {
+        return certificateModelAssembler.toCollectionModel(giftCertificateService.findByTagName(tagName));
     }
 
-    @GetMapping(params = {"tagNames", "limit", "offset"})
+    @GetMapping(params = {"tagNames", "page"})
     @ResponseStatus(HttpStatus.OK)
-    public List<GiftCertificate> findCertificatesByTags(@RequestParam("tagNames") List<String> tagNames,
-                                                        @RequestParam("limit") Integer limit,
-                                                        @RequestParam("offset") Integer offset) {
+    public List<EntityModel<GiftCertificate>> findCertificatesByTags(@RequestParam("tagNames") List<String> tagNames,
+                                                                     @RequestParam("page") Integer page)
+            throws IllegalPageNumberException {
         String[] tagNamesArray = new String[tagNames.size()];
-        return giftCertificateService.findCertificatesByTags(limit, offset, tagNames.toArray(tagNamesArray));
+        List<GiftCertificate> certificates
+                = giftCertificateService.findCertificatesByTags(page, tagNames.toArray(tagNamesArray));
+        return certificateModelAssembler.toCollectionModel(certificates);
     }
 
-    @GetMapping(params = {"name", "description", "limit", "offset"})
+    @GetMapping(params = {"name", "description", "page"})
     @ResponseStatus(HttpStatus.OK)
-    public List<GiftCertificate> findByNameAndDescription(@RequestParam("name") String name,
-                                                          @RequestParam("description") String description,
-                                                          @RequestParam("limit") Integer limit,
-                                                          @RequestParam("offset") Integer offset)
-            throws ParameterNotPresentException, DataNotFoundException {
-        List<GiftCertificate> certificates = giftCertificateService.findByNameAndDescription(name,
-                description, limit, offset);
-        for (GiftCertificate certificate : certificates) {
-            certificate.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(GiftCertificateController.class)
-                    .findGiftCertificate(certificate.getId()))
-                    .withSelfRel());
-            certificate.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(GiftCertificateController.class)
-                    .deleteGiftCertificate(certificate.getId()))
-                    .withRel(CustomLinkBuilder.CERTIFICATE_RELATION_NAME));
-        }
-        return certificates;
+    public List<EntityModel<GiftCertificate>> findByNameAndDescription(@RequestParam("name") String name,
+                                                                       @RequestParam("description") String description,
+                                                                       @RequestParam("page") Integer page)
+            throws IllegalPageNumberException {
+        List<GiftCertificate> certificates = giftCertificateService.findByNameAndDescription(name, description, page);
+        return certificateModelAssembler.toCollectionModel(certificates);
     }
 
-    @GetMapping(params = {"sortingParameter", "descending", "limit", "offset"})
+    @GetMapping(params = {"sortingParameter", "descending", "page"})
     @ResponseStatus(HttpStatus.OK)
-    public List<GiftCertificate> findSorted(@RequestParam("sortingParameter") String sortingParameter,
-                                            @RequestParam("descending") boolean descending,
-                                            @RequestParam("limit") Integer limit,
-                                            @RequestParam("offset") Integer offset)
-            throws ParameterNotPresentException, DataNotFoundException {
-        List<GiftCertificate> certificates = giftCertificateService.findSorted(sortingParameter,
-                descending, limit, offset);
-        for (GiftCertificate certificate : certificates) {
-            certificate.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(GiftCertificateController.class)
-                    .findGiftCertificate(certificate.getId()))
-                    .withSelfRel());
-            certificate.add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(GiftCertificateController.class)
-                    .deleteGiftCertificate(certificate.getId()))
-                    .withRel(CustomLinkBuilder.CERTIFICATE_RELATION_NAME));
-        }
-        return certificates;
+    public List<EntityModel<GiftCertificate>> findSorted(@RequestParam("sortingParameter") String sortingParameter,
+                                                         @RequestParam("descending") boolean descending,
+                                                         @RequestParam("page") Integer page)
+            throws IllegalPageNumberException {
+        List<GiftCertificate> certificates = giftCertificateService.findSorted(sortingParameter, descending, page);
+        return certificateModelAssembler.toCollectionModel(certificates);
     }
 
 }

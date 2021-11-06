@@ -1,7 +1,6 @@
 package com.epam.esm.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -11,7 +10,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "tags")
 @JsonIgnoreProperties(value = {"certificates"})
-public class Tag extends RepresentationModel<Tag> {
+public class Tag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
