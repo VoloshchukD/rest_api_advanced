@@ -76,7 +76,8 @@ public class UserServiceImpl implements UserService {
             throw new ParameterNotPresentException(ExceptionMessageHandler.USER_CODE,
                     ExceptionMessageHandler.USER_ID_NOT_PRESENT_MESSAGE_NAME);
         }
-        return userDao.findUserOrders(userId, PaginationLogics.DEFAULT_LIMIT, PaginationLogics.convertToOffset(page));
+        return userDao.findUserOrders(userId, PaginationLogics.DEFAULT_LIMIT,
+                PaginationLogics.convertToOffset(page));
     }
 
 }

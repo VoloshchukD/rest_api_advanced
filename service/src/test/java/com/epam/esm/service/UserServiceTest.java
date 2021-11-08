@@ -5,6 +5,7 @@ import com.epam.esm.dao.impl.UserDaoImpl;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.service.exception.DataNotFoundException;
+import com.epam.esm.service.exception.IllegalPageNumberException;
 import com.epam.esm.service.exception.ParameterNotPresentException;
 import com.epam.esm.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Assertions;
@@ -47,9 +48,9 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testFindAllUser() {
-        Mockito.when(userDao.findAll(3, 0)).thenReturn(Collections.singletonList(user));
-        Assertions.assertNotNull(userService.findAll(3, 0));
+    public void testFindAllUser() throws IllegalPageNumberException {
+        Mockito.when(userDao.findAll(5, 0)).thenReturn(Collections.singletonList(user));
+        Assertions.assertNotNull(userService.findAll(1));
     }
 
     @Test
@@ -59,9 +60,9 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testFindUserOrders() throws ParameterNotPresentException {
-        Mockito.when(userDao.findUserOrders(1L, 1, 0)).thenReturn(Collections.singletonList(order));
-        Assertions.assertNotNull(userService.findUserOrders(1L, 1, 0));
+    public void testFindUserOrders() throws ParameterNotPresentException, IllegalPageNumberException {
+        Mockito.when(userDao.findUserOrders(1L, 5, 0)).thenReturn(Collections.singletonList(order));
+        Assertions.assertNotNull(userService.findUserOrders(1L, 1));
     }
 
 }

@@ -34,9 +34,9 @@ public class TagController {
         return tagModelAssembler.toModel(tag);
     }
 
-    @GetMapping
+    @GetMapping(params = {"page"})
     @ResponseStatus(HttpStatus.OK)
-    public List<EntityModel<Tag>> findTags(@RequestParam Integer page) throws IllegalPageNumberException {
+    public List<EntityModel<Tag>> findTags(@RequestParam("page") Integer page) throws IllegalPageNumberException {
         List<Tag> tags = tagService.findAll(page);
         return tagModelAssembler.toCollectionModel(tags);
     }
@@ -45,7 +45,7 @@ public class TagController {
     public ResponseEntity<Boolean> addTag(@RequestBody Tag tag) {
         boolean result = tagService.add(tag);
         HttpStatus httpStatus = result ? HttpStatus.CREATED : HttpStatus.NOT_MODIFIED;
-        return new ResponseEntity(result, httpStatus);
+        return new ResponseEntity<>(result, httpStatus);
     }
 
     @PatchMapping
@@ -53,7 +53,7 @@ public class TagController {
             throws ParameterNotPresentException, DataNotFoundException {
         Tag updatedTag = tagService.update(tag);
         HttpStatus httpStatus = (updatedTag != null) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
-        return new ResponseEntity(updatedTag, httpStatus);
+        return new ResponseEntity<>(updatedTag, httpStatus);
     }
 
     @DeleteMapping(value = "/{id}")
@@ -61,38 +61,39 @@ public class TagController {
             throws ParameterNotPresentException, DataNotFoundException {
         boolean result = tagService.delete(id);
         HttpStatus httpStatus = result ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
-        return new ResponseEntity(result, httpStatus);
+        return new ResponseEntity<>(result, httpStatus);
     }
 
-    @PostMapping(params = {"certificateId", "tagId"})
-    public ResponseEntity<Boolean> addTagToCertificate(@RequestParam("certificateId") Long certificateId,
-                                                       @RequestParam("tagId") Long tagId)
-            throws ParameterNotPresentException {
+    @PostMapping(params = {"certificate-id", "tag-id"})
+    public ResponseEntity<Boolean> addTagToCertificate(@RequestParam("certificate-id") Long certificateId,
+                                                       @RequestParam("tag-id") Long tagId)
+            throws ParameterNotPresentException, DataNotFoundException {
         boolean result = tagService.addTagToCertificate(certificateId, tagId);
         HttpStatus httpStatus = result ? HttpStatus.CREATED : HttpStatus.NOT_MODIFIED;
-        return new ResponseEntity(result, httpStatus);
+        return new ResponseEntity<>(result, httpStatus);
     }
 
-    @PostMapping(params = {"certificateId"})
+    @PostMapping(params = {"certificate-id"})
     public ResponseEntity<Boolean> addTagToCertificate(@RequestBody Tag tag,
-                                                       @RequestParam("certificateId") Long certificateId)
-            throws ParameterNotPresentException {
+                                                       @RequestParam("certificate-id") Long certificateId)
+            throws ParameterNotPresentException, DataNotFoundException {
         boolean result = tagService.addTagToCertificate(tag, certificateId);
         HttpStatus httpStatus = result ? HttpStatus.CREATED : HttpStatus.NOT_MODIFIED;
-        return new ResponseEntity(result, httpStatus);
+        return new ResponseEntity<>(result, httpStatus);
     }
 
-    @DeleteMapping
-    public ResponseEntity<Boolean> deleteTagFromCertificate(@RequestParam Long certificateId, @RequestParam Long tagId)
+    @DeleteMapping(params = {"tag-id"})
+    public ResponseEntity<Boolean> deleteTagFromCertificate(@RequestParam("certificate-id") Long certificateId,
+                                                            @RequestParam("tag-id") Long tagId)
             throws ParameterNotPresentException {
         boolean result = tagService.deleteTagFromCertificate(certificateId, tagId);
         HttpStatus httpStatus = result ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
-        return new ResponseEntity(result, httpStatus);
+        return new ResponseEntity<>(result, httpStatus);
     }
 
-    @GetMapping(value = "/popular", params = {"userId"})
+    @GetMapping(value = "/popular", params = {"user-id"})
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<Tag> findPopularTag(@RequestParam("userId") Long userId) throws ParameterNotPresentException {
+    public EntityModel<Tag> findPopularTag(@RequestParam("user-id") Long userId) throws ParameterNotPresentException {
         return tagModelAssembler.toModel(tagService.findPopularTag(userId));
     }
 

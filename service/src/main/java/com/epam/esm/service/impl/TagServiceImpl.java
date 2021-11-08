@@ -1,7 +1,10 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.TagDao;
+import com.epam.esm.entity.CertificateTagMap;
+import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.exception.DataNotFoundException;
 import com.epam.esm.service.exception.IllegalPageNumberException;
@@ -17,8 +20,11 @@ public class TagServiceImpl implements TagService {
 
     private TagDao tagDao;
 
-    public TagServiceImpl(TagDao tagDao) {
+    private GiftCertificateService certificateService;
+
+    public TagServiceImpl(TagDao tagDao, GiftCertificateService certificateService) {
         this.tagDao = tagDao;
+        this.certificateService = certificateService;
     }
 
     @Override
@@ -82,26 +88,24 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public boolean addTagToCertificate(Long certificateId, Long tagId) throws ParameterNotPresentException {
-        if (certificateId == null) {
-            throw new ParameterNotPresentException(ExceptionMessageHandler.CERTIFICATE_CODE,
-                    ExceptionMessageHandler.CERTIFICATE_ID_NOT_PRESENT_MESSAGE_NAME);
-        }
-        if (tagId == null) {
-            throw new ParameterNotPresentException(ExceptionMessageHandler.TAG_CODE,
-                    ExceptionMessageHandler.TAG_ID_NOT_PRESENT_MESSAGE_NAME);
-        }
-        return tagDao.addTagToCertificate(certificateId, tagId);
+    public boolean addTagToCertificate(Long certificateId, Long tagId)
+            throws ParameterNotPresentException, DataNotFoundException {
+        GiftCertificate certificate = certificateService.find(certificateId);
+        Tag tag = find(tagId);
+        CertificateTagMap certificateTagMap = new CertificateTagMap();
+        certificateTagMap.setTag(tag);
+        certificateTagMap.setCertificate(certificate);
+        return tagDao.addTagToCertificate(certificateTagMap);
     }
 
     @Override
     public boolean addTagToCertificate(Tag tag, Long certificateId)
-            throws ParameterNotPresentException {
-        if (certificateId == null) {
-            throw new ParameterNotPresentException(ExceptionMessageHandler.CERTIFICATE_CODE,
-                    ExceptionMessageHandler.CERTIFICATE_ID_NOT_PRESENT_MESSAGE_NAME);
-        }
-        return tagDao.addTagToCertificate(tag, certificateId);
+            throws ParameterNotPresentException, DataNotFoundException {
+        GiftCertificate certificate = certificateService.find(certificateId);
+        CertificateTagMap certificateTagMap = new CertificateTagMap();
+        certificateTagMap.setTag(tag);
+        certificateTagMap.setCertificate(certificate);
+        return tagDao.addTagToCertificate(certificateTagMap);
     }
 
     @Override

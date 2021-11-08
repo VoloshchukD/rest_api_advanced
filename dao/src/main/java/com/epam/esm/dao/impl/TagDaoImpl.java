@@ -3,14 +3,12 @@ package com.epam.esm.dao.impl;
 import com.epam.esm.dao.ConstantQuery;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.entity.CertificateTagMap;
-import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
@@ -64,25 +62,7 @@ public class TagDaoImpl implements TagDao {
 
     @Transactional
     @Override
-    public boolean addTagToCertificate(Long certificateId, Long tagId) {
-        CertificateTagMap certificateTagMap = new CertificateTagMap();
-        GiftCertificate certificate = new GiftCertificate();
-        certificate.setId(certificateId);
-        certificateTagMap.setCertificate(certificate);
-        Tag tag = new Tag();
-        tag.setId(tagId);
-        certificateTagMap.setTag(tag);
-        return (entityManager.merge(certificateTagMap) != null);
-    }
-
-    @Transactional
-    @Override
-    public boolean addTagToCertificate(Tag tag, Long certificateId) {
-        CertificateTagMap certificateTagMap = new CertificateTagMap();
-        GiftCertificate certificate = new GiftCertificate();
-        certificate.setId(certificateId);
-        certificateTagMap.setCertificate(certificate);
-        certificateTagMap.setTag(tag);
+    public boolean addTagToCertificate(CertificateTagMap certificateTagMap) {
         return (entityManager.merge(certificateTagMap) != null);
     }
 

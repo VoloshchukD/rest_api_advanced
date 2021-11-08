@@ -1,7 +1,7 @@
 package com.epam.esm.entity;
 
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.hateoas.RepresentationModel;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -9,6 +9,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "orders")
+@EntityListeners(AuditingEntityListener.class)
 public class Order {
 
     @Id
@@ -18,7 +19,6 @@ public class Order {
 
     @CreatedDate
     @Column(name = "purchase_timestamp")
-    @Temporal(TemporalType.TIMESTAMP)
     private Date purchaseTimestamp;
 
     @Column(name = "total_cost")

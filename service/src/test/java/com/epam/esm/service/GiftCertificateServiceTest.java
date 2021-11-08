@@ -1,11 +1,15 @@
 package com.epam.esm.service;
 
 import com.epam.esm.dao.GiftCertificateDao;
+import com.epam.esm.dao.UserDao;
 import com.epam.esm.dao.impl.GiftCertificateDaoImpl;
+import com.epam.esm.dao.impl.UserDaoImpl;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.service.exception.DataNotFoundException;
+import com.epam.esm.service.exception.IllegalPageNumberException;
 import com.epam.esm.service.exception.ParameterNotPresentException;
 import com.epam.esm.service.impl.GiftCertificateServiceImpl;
+import com.epam.esm.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +24,8 @@ public class GiftCertificateServiceTest {
     private GiftCertificateService giftCertificateService;
 
     private GiftCertificateDao giftCertificateDao;
+
+    private UserDao userDao;
 
     private static GiftCertificate giftCertificate;
 
@@ -38,7 +44,9 @@ public class GiftCertificateServiceTest {
     @BeforeEach
     public void setUpMocks() {
         giftCertificateDao = Mockito.mock(GiftCertificateDaoImpl.class);
-        giftCertificateService = new GiftCertificateServiceImpl(giftCertificateDao);
+        userDao = Mockito.mock(UserDaoImpl.class);
+        UserService userService = new UserServiceImpl(userDao);
+        giftCertificateService = new GiftCertificateServiceImpl(giftCertificateDao, userService);
     }
 
     @Test
@@ -54,41 +62,42 @@ public class GiftCertificateServiceTest {
     }
 
     @Test
-    public void testFindAllGiftCertificates() {
-        Mockito.when(giftCertificateDao.findAll(3, 0)).thenReturn(Collections.singletonList(giftCertificate));
-        Assertions.assertNotNull(giftCertificateService.findAll(3, 0));
+    public void testFindAllGiftCertificates() throws IllegalPageNumberException {
+        Mockito.when(giftCertificateDao.findAll(5, 0)).thenReturn(
+                Collections.singletonList(giftCertificate));
+        Assertions.assertNotNull(giftCertificateService.findAll(1));
     }
 
     @Test
     public void testFindByTagName() {
         String tagName = "test";
-        Mockito.when(giftCertificateDao.findByTagName(tagName)).thenReturn(giftCertificate);
+        Mockito.when(giftCertificateDao.findByTagName(tagName)).thenReturn(Collections.singletonList(giftCertificate));
         Assertions.assertNotNull(giftCertificateService.findByTagName(tagName));
     }
 
     @Test
-    public void testFindByNameAndDescription() {
+    public void testFindByNameAndDescription() throws IllegalPageNumberException {
         String name = "qwerty";
-        String description = "qwerty";
-        Mockito.when(giftCertificateDao.findByNameAndDescription(name, description, 3, 0)).thenReturn(
+        String description = "-";
+        Mockito.when(giftCertificateDao.findByNameAndDescription(name, description, 5, 0)).thenReturn(
                 Collections.singletonList(giftCertificate));
-        Assertions.assertNotNull(giftCertificateService.findByNameAndDescription(name, description, 3, 0));
+        Assertions.assertNotNull(giftCertificateService.findByNameAndDescription(name, description, 1));
     }
 
     @Test
-    public void testFindSorted() {
+    public void testFindSorted() throws IllegalPageNumberException {
         String sortingParameter = "name";
-        Mockito.when(giftCertificateDao.findSorted(sortingParameter, 3, 0)).thenReturn(
+        Mockito.when(giftCertificateDao.findSorted(sortingParameter, 5, 0)).thenReturn(
                 Collections.singletonList(giftCertificate));
-        Assertions.assertNotNull(giftCertificateService.findSorted(sortingParameter, false, 3, 0));
+        Assertions.assertNotNull(giftCertificateService.findSorted(sortingParameter, false, 1));
     }
 
     @Test
-    public void testFindCertificatesByTags() {
-        Mockito.when(giftCertificateDao.findCertificatesByTags(3, 0, "John", "Wick")).thenReturn(
+    public void testFindCertificatesByTags() throws IllegalPageNumberException {
+        Mockito.when(giftCertificateDao.findCertificatesByTags(3, 0, "John", "Bob")).thenReturn(
                 Collections.singletonList(giftCertificate));
         Assertions.assertNotNull(
-                giftCertificateService.findCertificatesByTags(3, 0, "John", "Wick"));
+                giftCertificateService.findCertificatesByTags(1, "John", "Bob"));
     }
 
 }

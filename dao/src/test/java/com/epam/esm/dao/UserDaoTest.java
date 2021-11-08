@@ -1,32 +1,22 @@
 package com.epam.esm.dao;
 
 import com.epam.esm.dao.configuration.TestDataSourceConfiguration;
-import com.epam.esm.entity.User;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+@Sql(scripts = "/data.sql")
 @SpringJUnitConfig(TestDataSourceConfiguration.class)
 public class UserDaoTest {
 
     @Autowired
     private UserDao userDao;
 
-    private static User user;
-
-    @BeforeAll
-    public static void initializeUser() {
-        user = new User();
-        user.setId(1L);
-        user.setForename("John");
-        user.setSurname("Wick");
-    }
-
     @Test
     public void testFindUser() {
-        Assertions.assertNotNull(userDao.find(user.getId()));
+        Assertions.assertNotNull(userDao.find(1L));
     }
 
     @Test
@@ -36,7 +26,7 @@ public class UserDaoTest {
 
     @Test
     public void testFindUserOrder() {
-        Assertions.assertNotNull(userDao.findUserOrder(1L, user.getId()));
+        Assertions.assertNotNull(userDao.findUserOrder(1L, 1L));
     }
 
     @Test

@@ -34,7 +34,9 @@ public interface BaseService<T> {
     /**
      * Method with all entities seeking logics.
      *
+     * @param page - required page number with data
      * @return list of all founded entities
+     * @throws {@link IllegalPageNumberException} when page invalid number
      */
     List<T> findAll(Integer page) throws IllegalPageNumberException;
 

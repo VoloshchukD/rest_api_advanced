@@ -2,7 +2,10 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.GiftCertificateDao;
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.Order;
+import com.epam.esm.entity.User;
 import com.epam.esm.service.GiftCertificateService;
+import com.epam.esm.service.UserService;
 import com.epam.esm.service.exception.DataNotFoundException;
 import com.epam.esm.service.exception.IllegalPageNumberException;
 import com.epam.esm.service.exception.ParameterNotPresentException;
@@ -18,8 +21,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     private GiftCertificateDao giftCertificateDao;
 
-    public GiftCertificateServiceImpl(GiftCertificateDao giftCertificateDao) {
+    private UserService userService;
+
+    public GiftCertificateServiceImpl(GiftCertificateDao giftCertificateDao, UserService userService) {
         this.giftCertificateDao = giftCertificateDao;
+        this.userService = userService;
     }
 
     @Override
@@ -28,17 +34,15 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public boolean addCertificateToUser(Long certificateId, Long userId) throws ParameterNotPresentException {
-        if (certificateId == null) {
-            throw new ParameterNotPresentException(ExceptionMessageHandler.CERTIFICATE_CODE,
-                    ExceptionMessageHandler.CERTIFICATE_ID_NOT_PRESENT_MESSAGE_NAME);
-        }
-        if (userId == null) {
-            throw new ParameterNotPresentException(ExceptionMessageHandler.USER_CODE,
-                    ExceptionMessageHandler.USER_ID_NOT_PRESENT_MESSAGE_NAME);
-        }
-        GiftCertificate certificate = giftCertificateDao.find(certificateId);
-        return giftCertificateDao.addCertificateToUser(certificate, userId);
+    public boolean addCertificateToUser(Long certificateId, Long userId)
+            throws ParameterNotPresentException, DataNotFoundException {
+        GiftCertificate certificate = find(certificateId);
+        User user = userService.find(userId);
+        Order order = new Order();
+        order.setUser(user);
+        order.setCertificate(certificate);
+        order.setTotalCost(certificate.getPrice());
+        return giftCertificateDao.addCertificateToUser(order);
     }
 
     @Override

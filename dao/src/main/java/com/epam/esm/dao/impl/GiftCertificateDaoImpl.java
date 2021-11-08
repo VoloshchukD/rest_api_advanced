@@ -4,7 +4,6 @@ import com.epam.esm.dao.ConstantQuery;
 import com.epam.esm.dao.GiftCertificateDao;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
-import com.epam.esm.entity.User;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,13 +26,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Transactional
     @Override
-    public boolean addCertificateToUser(GiftCertificate certificate, Long userId) {
-        Order order = new Order();
-        User user = new User();
-        user.setId(userId);
-        order.setUser(user);
-        order.setCertificate(certificate);
-        order.setTotalCost(certificate.getPrice());
+    public boolean addCertificateToUser(Order order) {
         return (entityManager.merge(order) != null);
     }
 
@@ -58,6 +51,9 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     @Transactional
     @Override
     public boolean delete(Long id) {
+        entityManager.createQuery(ConstantQuery.DELETE_USERS_FROM_CERTIFICATE_BY_CERTIFICATE_ID_QUERY)
+                .setParameter(ConstantQuery.CERTIFICATE_ID_PARAMETER_NAME, id)
+                .executeUpdate();
         entityManager.createQuery(ConstantQuery.DELETE_TAG_FROM_CERTIFICATES_BY_CERTIFICATE_ID_QUERY)
                 .setParameter(ConstantQuery.CERTIFICATE_ID_PARAMETER_NAME, id)
                 .executeUpdate();

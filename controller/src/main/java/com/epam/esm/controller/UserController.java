@@ -39,24 +39,24 @@ public class UserController {
         return userModelAssembler.toModel(user);
     }
 
-    @GetMapping
+    @GetMapping(params = {"page"})
     @ResponseStatus(HttpStatus.OK)
-    public List<EntityModel<User>> findUsers(@RequestParam Integer page) throws IllegalPageNumberException {
+    public List<EntityModel<User>> findUsers(@RequestParam("page") Integer page) throws IllegalPageNumberException {
         List<User> users = userService.findAll(page);
         return userModelAssembler.toCollectionModel(users);
     }
 
-    @GetMapping(value = "/orders/{orderId}", params = {"userId"})
+    @GetMapping(value = "/orders/{orderId}", params = {"user-id"})
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<Order> findUserOrder(@PathVariable("orderId") Long orderId, @RequestParam("userId") Long userId)
+    public EntityModel<Order> findUserOrder(@PathVariable("orderId") Long orderId, @RequestParam("user-id") Long userId)
             throws ParameterNotPresentException {
         Order order = userService.findUserOrder(orderId, userId);
         return orderModelAssembler.toModel(order);
     }
 
-    @GetMapping(value = "/orders", params = {"userId", "page"})
+    @GetMapping(value = "/orders", params = {"user-id", "page"})
     @ResponseStatus(HttpStatus.OK)
-    public List<EntityModel<Order>> findUserOrders(@RequestParam("userId") Long userId,
+    public List<EntityModel<Order>> findUserOrders(@RequestParam("user-id") Long userId,
                                                    @RequestParam("page") Integer page)
             throws ParameterNotPresentException, IllegalPageNumberException {
         return orderModelAssembler.toCollectionModel(userService.findUserOrders(userId, page));

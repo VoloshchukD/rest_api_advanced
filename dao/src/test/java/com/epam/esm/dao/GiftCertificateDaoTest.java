@@ -2,14 +2,18 @@ package com.epam.esm.dao;
 
 import com.epam.esm.dao.configuration.TestDataSourceConfiguration;
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.Order;
+import com.epam.esm.entity.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.util.Date;
 
+@Sql(scripts = "/data.sql")
 @SpringJUnitConfig(TestDataSourceConfiguration.class)
 public class GiftCertificateDaoTest {
 
@@ -18,16 +22,22 @@ public class GiftCertificateDaoTest {
 
     private static GiftCertificate giftCertificate;
 
+    private static Order order;
+
     @BeforeAll
     public static void initializeGiftCertificate() {
         giftCertificate = new GiftCertificate();
-        giftCertificate.setId(1L);
         giftCertificate.setName("qwerty");
         giftCertificate.setLastUpdateDate(new Date());
         giftCertificate.setCreateDate(new Date());
         giftCertificate.setDescription("test");
         giftCertificate.setDuration(1);
         giftCertificate.setPrice(1);
+        order = new Order();
+        order.setCertificate(giftCertificate);
+        User user = new User();
+        user.setId(1L);
+        order.setUser(user);
     }
 
     @Test
@@ -37,7 +47,7 @@ public class GiftCertificateDaoTest {
 
     @Test
     public void testFindCertificate() {
-        Assertions.assertNotNull(giftCertificateDao.find(giftCertificate.getId()));
+        Assertions.assertNotNull(giftCertificateDao.find(1L));
     }
 
     @Test
@@ -48,8 +58,10 @@ public class GiftCertificateDaoTest {
     @Test
     public void testUpdateCertificate() {
         String updatedString = "updated";
-        giftCertificate.setDescription(updatedString);
-        Assertions.assertEquals(giftCertificate, giftCertificateDao.update(giftCertificate));
+        GiftCertificate forUpdate = new GiftCertificate();
+        forUpdate.setId(1L);
+        forUpdate.setName(updatedString);
+        Assertions.assertEquals(updatedString, giftCertificateDao.update(forUpdate).getName());
     }
 
     @Test
@@ -75,7 +87,10 @@ public class GiftCertificateDaoTest {
 
     @Test
     public void testAddCertificateToUser() {
-        Assertions.assertTrue(giftCertificateDao.addCertificateToUser(giftCertificate, 1L, new Date()));
+        GiftCertificate forAdd = new GiftCertificate();
+        forAdd.setId(1L);
+        order.setCertificate(forAdd);
+        Assertions.assertTrue(giftCertificateDao.addCertificateToUser(order));
     }
 
     @Test

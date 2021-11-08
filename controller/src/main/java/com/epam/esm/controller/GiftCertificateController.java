@@ -47,44 +47,43 @@ public class GiftCertificateController {
     public ResponseEntity<Boolean> addGiftCertificate(@RequestBody GiftCertificate certificate) {
         boolean result = giftCertificateService.add(certificate);
         HttpStatus httpStatus = result ? HttpStatus.CREATED : HttpStatus.NOT_MODIFIED;
-        return new ResponseEntity(result, httpStatus);
+        return new ResponseEntity<>(result, httpStatus);
     }
 
-    @PostMapping(params = {"certificateId", "userId"})
-    public ResponseEntity<Boolean> addCertificateToUser(@RequestParam("certificateId") Long certificateId,
-                                                        @RequestParam("userId") Long userId)
-            throws ParameterNotPresentException {
+    @PostMapping(params = {"certificate-id", "user-id"})
+    public ResponseEntity<Boolean> addCertificateToUser(@RequestParam("certificate-id") Long certificateId,
+                                                        @RequestParam("user-id") Long userId)
+            throws ParameterNotPresentException, DataNotFoundException {
         boolean result = giftCertificateService.addCertificateToUser(certificateId, userId);
         HttpStatus httpStatus = result ? HttpStatus.CREATED : HttpStatus.NOT_MODIFIED;
-        return new ResponseEntity(result, httpStatus);
+        return new ResponseEntity<>(result, httpStatus);
     }
 
     @PatchMapping
     public ResponseEntity<GiftCertificate> updateGiftCertificate(@RequestBody GiftCertificate giftCertificate)
             throws ParameterNotPresentException, DataNotFoundException {
         GiftCertificate updatedGiftCertificate = giftCertificateService.update(giftCertificate);
-        HttpStatus httpStatus = (updatedGiftCertificate != null)
-                ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
-        return new ResponseEntity(updatedGiftCertificate, httpStatus);
+        HttpStatus httpStatus = (updatedGiftCertificate != null) ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
+        return new ResponseEntity<>(updatedGiftCertificate, httpStatus);
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<GiftCertificate> deleteGiftCertificate(@PathVariable("id") Long id)
+    public ResponseEntity<Boolean> deleteGiftCertificate(@PathVariable("id") Long id)
             throws ParameterNotPresentException, DataNotFoundException {
         boolean result = giftCertificateService.delete(id);
         HttpStatus httpStatus = result ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
-        return new ResponseEntity(result, httpStatus);
+        return new ResponseEntity<>(result, httpStatus);
     }
 
-    @GetMapping(params = {"tagName"})
+    @GetMapping(params = {"tag-name"})
     @ResponseStatus(HttpStatus.OK)
-    public List<EntityModel<GiftCertificate>> findGiftCertificateByTagName(@RequestParam("tagName") String tagName) {
+    public List<EntityModel<GiftCertificate>> findGiftCertificateByTagName(@RequestParam("tag-name") String tagName) {
         return certificateModelAssembler.toCollectionModel(giftCertificateService.findByTagName(tagName));
     }
 
-    @GetMapping(params = {"tagNames", "page"})
+    @GetMapping(params = {"tag-names", "page"})
     @ResponseStatus(HttpStatus.OK)
-    public List<EntityModel<GiftCertificate>> findCertificatesByTags(@RequestParam("tagNames") List<String> tagNames,
+    public List<EntityModel<GiftCertificate>> findCertificatesByTags(@RequestParam("tag-names") List<String> tagNames,
                                                                      @RequestParam("page") Integer page)
             throws IllegalPageNumberException {
         String[] tagNamesArray = new String[tagNames.size()];
@@ -103,13 +102,13 @@ public class GiftCertificateController {
         return certificateModelAssembler.toCollectionModel(certificates);
     }
 
-    @GetMapping(params = {"sortingParameter", "descending", "page"})
+    @GetMapping(params = {"sorting-value", "descending", "page"})
     @ResponseStatus(HttpStatus.OK)
-    public List<EntityModel<GiftCertificate>> findSorted(@RequestParam("sortingParameter") String sortingParameter,
+    public List<EntityModel<GiftCertificate>> findSorted(@RequestParam("sorting-value") String sortingValue,
                                                          @RequestParam("descending") boolean descending,
                                                          @RequestParam("page") Integer page)
             throws IllegalPageNumberException {
-        List<GiftCertificate> certificates = giftCertificateService.findSorted(sortingParameter, descending, page);
+        List<GiftCertificate> certificates = giftCertificateService.findSorted(sortingValue, descending, page);
         return certificateModelAssembler.toCollectionModel(certificates);
     }
 

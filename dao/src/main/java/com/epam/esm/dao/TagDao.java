@@ -1,12 +1,11 @@
 package com.epam.esm.dao;
 
+import com.epam.esm.entity.CertificateTagMap;
 import com.epam.esm.entity.Tag;
 
 public interface TagDao extends BaseDao<Tag> {
 
-    boolean addTagToCertificate(Long certificateId, Long tagId);
-
-    boolean addTagToCertificate(Tag tag, Long certificateId);
+    boolean addTagToCertificate(CertificateTagMap certificateTagMap);
 
     Tag findPopularTag(Long userId);
 
