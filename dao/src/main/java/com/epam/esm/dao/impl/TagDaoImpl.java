@@ -2,91 +2,76 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.ConstantQuery;
 import com.epam.esm.dao.TagDao;
+import com.epam.esm.entity.CertificateTagMap;
 import com.epam.esm.entity.Tag;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.PreparedStatement;
-import java.sql.Statement;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.util.List;
 
 @Repository
 public class TagDaoImpl implements TagDao {
 
-    private JdbcTemplate jdbcTemplate;
+    @PersistenceContext
+    private EntityManager entityManager;
 
-    public TagDaoImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
+    @Transactional
     @Override
     public boolean add(Tag tag) {
-        int affectedRows = jdbcTemplate.update(ConstantQuery.ADD_TAG_QUERY, tag.getName());
-        return (affectedRows == 1);
+        return (entityManager.merge(tag) != null);
     }
 
     @Override
     public Tag find(Long id) {
-        return jdbcTemplate.query(ConstantQuery.FIND_TAG_QUERY, new BeanPropertyRowMapper<>(Tag.class),
-                new Object[]{id})
-                .stream()
-                .findAny()
-                .orElse(null);
+        return entityManager.find(Tag.class, id);
     }
 
     @Override
-    public List<Tag> findAll() {
-        return jdbcTemplate.query(ConstantQuery.FIND_ALL_TAGS_QUERY,
-                new BeanPropertyRowMapper<>(Tag.class));
+    public List<Tag> findAll(Integer limit, Integer offset) {
+        TypedQuery<Tag> query = entityManager.createQuery(ConstantQuery.FIND_ALL_TAGS_QUERY, Tag.class);
+        return query.setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
+    @Override
+    public Tag findPopularTag(Long userId) {
+        TypedQuery<Tag> query = entityManager.createQuery(ConstantQuery.FIND_POPULAR_TAG_QUERY, Tag.class);
+        return query.setParameter(ConstantQuery.USER_ID_PARAMETER_NAME, userId)
+                .setMaxResults(ConstantQuery.SINGLE_LIMIT_VALUE).getSingleResult();
     }
 
     @Transactional
     @Override
     public Tag update(Tag tag) {
-        int affectedRows = jdbcTemplate.update(ConstantQuery.UPDATE_TAG_QUERY, tag.getName(), tag.getId());
-        return (affectedRows == 1) ? tag : null;
+        return entityManager.merge(tag);
     }
 
     @Transactional
     @Override
     public boolean delete(Long id) {
-        jdbcTemplate.update(ConstantQuery.DELETE_TAG_FROM_CERTIFICATES_BY_TAG_ID_QUERY, id);
-        int affectedRows = jdbcTemplate.update(ConstantQuery.DELETE_TAG_QUERY, id);
-        return (affectedRows == 1);
-    }
-
-    @Override
-    public boolean addTagToCertificate(Long certificateId, Long tagId) {
-        int affectedRows = jdbcTemplate.update(ConstantQuery.ADD_TAG_TO_CERTIFICATE_QUERY, certificateId, tagId);
+        entityManager.createQuery(ConstantQuery.DELETE_TAG_FROM_CERTIFICATES_BY_TAG_ID_QUERY)
+                .setParameter(ConstantQuery.TAG_ID_COLUMN_NAME, id).executeUpdate();
+        int affectedRows = entityManager.createQuery(ConstantQuery.DELETE_TAG_QUERY)
+                .setParameter(ConstantQuery.TAG_ID_COLUMN_NAME, id).executeUpdate();
         return (affectedRows == 1);
     }
 
     @Transactional
     @Override
-    public boolean addTagToCertificate(Tag tag, Long certificateId) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        int affectedRows = jdbcTemplate.update(connection -> {
-            PreparedStatement preparedStatement = connection.prepareStatement(ConstantQuery.ADD_TAG_QUERY,
-                    Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, tag.getName());
-            return preparedStatement;
-        }, keyHolder);
-        if (affectedRows == 1) {
-            if (keyHolder.getKeys() != null) {
-                return addTagToCertificate(certificateId,
-                        ((Number) keyHolder.getKeys().get(ConstantQuery.TAG_ID_COLUMN_NAME)).longValue());
-            }
-        }
-        return false;
+    public boolean addTagToCertificate(CertificateTagMap certificateTagMap) {
+        return (entityManager.merge(certificateTagMap) != null);
     }
 
+    @Transactional
     @Override
     public boolean deleteTagFromCertificate(Long certificateId, Long tagId) {
-        int affectedRows = jdbcTemplate.update(ConstantQuery.DELETE_TAG_FROM_CERTIFICATE_QUERY, certificateId, tagId);
+        int affectedRows = entityManager.createQuery(ConstantQuery.DELETE_TAG_FROM_CERTIFICATE_QUERY)
+                .setParameter(ConstantQuery.CERTIFICATE_ID_PARAMETER_NAME, certificateId)
+                .setParameter(ConstantQuery.TAG_ID_COLUMN_NAME, tagId).executeUpdate();
         return (affectedRows == 1);
     }
 

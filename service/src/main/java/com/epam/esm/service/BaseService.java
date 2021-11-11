@@ -1,6 +1,7 @@
 package com.epam.esm.service;
 
 import com.epam.esm.service.exception.DataNotFoundException;
+import com.epam.esm.service.exception.IllegalPageNumberException;
 import com.epam.esm.service.exception.ParameterNotPresentException;
 
 import java.util.List;
@@ -33,9 +34,12 @@ public interface BaseService<T> {
     /**
      * Method with all entities seeking logics.
      *
+     * @param page      - required page number with data
+     * @param itemCount - required items amount for the page
      * @return list of all founded entities
+     * @throws {@link IllegalPageNumberException} when page invalid number
      */
-    List<T> findAll();
+    List<T> findAll(Integer page, Integer itemCount) throws IllegalPageNumberException;
 
     /**
      * Method with entity data refresh.
@@ -53,7 +57,8 @@ public interface BaseService<T> {
      * @param id - identifier of target entity
      * @return boolean result of deletion
      * @throws {@link ParameterNotPresentException}
+     * @throws {@link DataNotFoundException}
      */
-    boolean delete(Long id) throws ParameterNotPresentException;
+    boolean delete(Long id) throws ParameterNotPresentException, DataNotFoundException;
 
 }

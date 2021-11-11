@@ -8,7 +8,7 @@ public interface BaseDao<T> {
 
     T find(Long id);
 
-    List<T> findAll();
+    List<T> findAll(Integer limit, Integer offset);
 
     T update(T t);
 

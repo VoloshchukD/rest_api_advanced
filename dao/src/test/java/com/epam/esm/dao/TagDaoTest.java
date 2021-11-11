@@ -1,14 +1,17 @@
 package com.epam.esm.dao;
 
 import com.epam.esm.dao.configuration.TestDataSourceConfiguration;
+import com.epam.esm.entity.CertificateTagMap;
+import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.event.annotation.BeforeTestMethod;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+@Sql(scripts = "/data.sql")
 @SpringJUnitConfig(TestDataSourceConfiguration.class)
 public class TagDaoTest {
 
@@ -20,7 +23,6 @@ public class TagDaoTest {
     @BeforeAll
     public static void initializeTag() {
         tag = new Tag();
-        tag.setId(1L);
         tag.setName("test-tag");
     }
 
@@ -31,19 +33,21 @@ public class TagDaoTest {
 
     @Test
     public void testFindTag() {
-        Assertions.assertNotNull(tagDao.find(tag.getId()));
+        Assertions.assertNotNull(tagDao.find(1L));
     }
 
     @Test
     public void testFindAllTags() {
-        Assertions.assertNotNull(tagDao.findAll());
+        Assertions.assertNotNull(tagDao.findAll(3, 0));
     }
 
     @Test
     public void testUpdateTag() {
         String updatedString = "updated";
-        tag.setName(updatedString);
-        Assertions.assertEquals(tag, tagDao.update(tag));
+        Tag forUpdate = new Tag();
+        forUpdate.setId(1L);
+        forUpdate.setName(updatedString);
+        Assertions.assertEquals(updatedString, tagDao.update(forUpdate).getName());
     }
 
     @Test
@@ -53,17 +57,19 @@ public class TagDaoTest {
 
     @Test
     public void testAddTagToCertificate() {
-        Assertions.assertTrue(tagDao.addTagToCertificate(4L, 4L));
-    }
-
-    @BeforeTestMethod
-    public void addTagToCertificate() {
-        tagDao.addTagToCertificate(3L, 4L);
+        GiftCertificate certificate = new GiftCertificate();
+        certificate.setId(4L);
+        Tag tag = new Tag();
+        tag.setId(4L);
+        CertificateTagMap certificateTagMap = new CertificateTagMap();
+        certificateTagMap.setTag(tag);
+        certificateTagMap.setCertificate(certificate);
+        Assertions.assertTrue(tagDao.addTagToCertificate(certificateTagMap));
     }
 
     @Test
-    public void testDeleteTagFromCertificate() {
-        Assertions.assertTrue(tagDao.deleteTagFromCertificate(3L, 4L));
+    public void testFindPopularTag() {
+        Assertions.assertNotNull(tagDao.findPopularTag(1L));
     }
 
 }
