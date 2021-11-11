@@ -59,7 +59,7 @@ public class TagServiceTest {
     @Test
     public void testFindAllTags() throws IllegalPageNumberException {
         Mockito.when(tagDao.findAll(5, 0)).thenReturn(Collections.singletonList(tag));
-        Assertions.assertNotNull(tagService.findAll(1));
+        Assertions.assertNotNull(tagService.findAll(1, 5));
     }
 
     @Test

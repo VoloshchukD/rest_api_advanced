@@ -42,8 +42,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findAll(Integer page) throws IllegalPageNumberException {
-        return userDao.findAll(PaginationLogics.DEFAULT_LIMIT, PaginationLogics.convertToOffset(page));
+    public List<User> findAll(Integer page, Integer itemCount) throws IllegalPageNumberException {
+        return userDao.findAll(itemCount, PaginationLogics.convertToOffset(page, itemCount));
     }
 
     @Override
@@ -70,14 +70,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Order> findUserOrders(Long userId, Integer page)
+    public List<Order> findUserOrders(Long userId, Integer page, Integer itemCount)
             throws ParameterNotPresentException, IllegalPageNumberException {
         if (userId == null) {
             throw new ParameterNotPresentException(ExceptionMessageHandler.USER_CODE,
                     ExceptionMessageHandler.USER_ID_NOT_PRESENT_MESSAGE_NAME);
         }
-        return userDao.findUserOrders(userId, PaginationLogics.DEFAULT_LIMIT,
-                PaginationLogics.convertToOffset(page));
+        return userDao.findUserOrders(userId, itemCount, PaginationLogics.convertToOffset(page, itemCount));
     }
 
 }

@@ -39,10 +39,12 @@ public class UserController {
         return userModelAssembler.toModel(user);
     }
 
-    @GetMapping(params = {"page"})
+    @GetMapping(params = {"page", "item-count"})
     @ResponseStatus(HttpStatus.OK)
-    public List<EntityModel<User>> findUsers(@RequestParam("page") Integer page) throws IllegalPageNumberException {
-        List<User> users = userService.findAll(page);
+    public List<EntityModel<User>> findUsers(@RequestParam("page") Integer page,
+                                             @RequestParam("item-count") Integer itemCount)
+            throws IllegalPageNumberException {
+        List<User> users = userService.findAll(page, itemCount);
         return userModelAssembler.toCollectionModel(users);
     }
 
@@ -54,12 +56,13 @@ public class UserController {
         return orderModelAssembler.toModel(order);
     }
 
-    @GetMapping(value = "/orders", params = {"user-id", "page"})
+    @GetMapping(value = "/orders", params = {"user-id", "page", "item-count"})
     @ResponseStatus(HttpStatus.OK)
     public List<EntityModel<Order>> findUserOrders(@RequestParam("user-id") Long userId,
-                                                   @RequestParam("page") Integer page)
+                                                   @RequestParam("page") Integer page,
+                                                   @RequestParam("item-count") Integer itemCount)
             throws ParameterNotPresentException, IllegalPageNumberException {
-        return orderModelAssembler.toCollectionModel(userService.findUserOrders(userId, page));
+        return orderModelAssembler.toCollectionModel(userService.findUserOrders(userId, page, itemCount));
     }
 
 }

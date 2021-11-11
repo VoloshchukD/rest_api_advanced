@@ -2,6 +2,7 @@ package com.epam.esm.controller;
 
 import com.epam.esm.controller.util.assembler.GiftCertificateModelAssembler;
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.dto.SortDataDto;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.exception.DataNotFoundException;
 import com.epam.esm.service.exception.IllegalPageNumberException;
@@ -35,11 +36,12 @@ public class GiftCertificateController {
         return certificateModelAssembler.toModel(certificate);
     }
 
-    @GetMapping(params = {"page"})
+    @GetMapping(params = {"page", "item-count"})
     @ResponseStatus(HttpStatus.OK)
-    public List<EntityModel<GiftCertificate>> findGiftCertificates(@RequestParam("page") Integer page)
+    public List<EntityModel<GiftCertificate>> findGiftCertificates(@RequestParam("page") Integer page,
+                                                                   @RequestParam("item-count") Integer itemCount)
             throws IllegalPageNumberException {
-        List<GiftCertificate> certificates = giftCertificateService.findAll(page);
+        List<GiftCertificate> certificates = giftCertificateService.findAll(page, itemCount);
         return certificateModelAssembler.toCollectionModel(certificates);
     }
 
@@ -81,34 +83,35 @@ public class GiftCertificateController {
         return certificateModelAssembler.toCollectionModel(giftCertificateService.findByTagName(tagName));
     }
 
-    @GetMapping(params = {"tag-names", "page"})
+    @GetMapping(params = {"tag-names", "page", "item-count"})
     @ResponseStatus(HttpStatus.OK)
     public List<EntityModel<GiftCertificate>> findCertificatesByTags(@RequestParam("tag-names") List<String> tagNames,
-                                                                     @RequestParam("page") Integer page)
+                                                                     @RequestParam("page") Integer page,
+                                                                     @RequestParam("item-count") Integer itemCount)
             throws IllegalPageNumberException {
         String[] tagNamesArray = new String[tagNames.size()];
         List<GiftCertificate> certificates
-                = giftCertificateService.findCertificatesByTags(page, tagNames.toArray(tagNamesArray));
+                = giftCertificateService.findCertificatesByTags(page, itemCount, tagNames.toArray(tagNamesArray));
         return certificateModelAssembler.toCollectionModel(certificates);
     }
 
-    @GetMapping(params = {"name", "description", "page"})
+    @GetMapping(params = {"page", "limit"})
     @ResponseStatus(HttpStatus.OK)
-    public List<EntityModel<GiftCertificate>> findByNameAndDescription(@RequestParam("name") String name,
-                                                                       @RequestParam("description") String description,
-                                                                       @RequestParam("page") Integer page)
+    public List<EntityModel<GiftCertificate>> findByNameAndDescription(@RequestBody GiftCertificate certificate,
+                                                                       @RequestParam("page") Integer page,
+                                                                       @RequestParam("limit") Integer itemCount)
             throws IllegalPageNumberException {
-        List<GiftCertificate> certificates = giftCertificateService.findByNameAndDescription(name, description, page);
+        List<GiftCertificate> certificates
+                = giftCertificateService.findByNameAndDescription(certificate, page, itemCount);
         return certificateModelAssembler.toCollectionModel(certificates);
     }
 
-    @GetMapping(params = {"sorting-value", "descending", "page"})
+    @GetMapping(params = {"page"})
     @ResponseStatus(HttpStatus.OK)
-    public List<EntityModel<GiftCertificate>> findSorted(@RequestParam("sorting-value") String sortingValue,
-                                                         @RequestParam("descending") boolean descending,
+    public List<EntityModel<GiftCertificate>> findSorted(@RequestBody SortDataDto sortData,
                                                          @RequestParam("page") Integer page)
             throws IllegalPageNumberException {
-        List<GiftCertificate> certificates = giftCertificateService.findSorted(sortingValue, descending, page);
+        List<GiftCertificate> certificates = giftCertificateService.findSorted(sortData, page);
         return certificateModelAssembler.toCollectionModel(certificates);
     }
 

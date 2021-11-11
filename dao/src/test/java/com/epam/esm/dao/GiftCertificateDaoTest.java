@@ -4,6 +4,7 @@ import com.epam.esm.dao.configuration.TestDataSourceConfiguration;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
+import com.epam.esm.entity.dto.SortDataDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -76,13 +77,20 @@ public class GiftCertificateDaoTest {
 
     @Test
     public void testFindByNameAndDescription() {
-        Assertions.assertNotNull(
-                giftCertificateDao.findByNameAndDescription("qwer", "qwer", 3, 0));
+        GiftCertificate forSearch = new GiftCertificate();
+        forSearch.setName("qwer");
+        forSearch.setDescription("qwer");
+        Assertions.assertNotNull(giftCertificateDao.findByNameAndDescription(forSearch, 3, 0));
     }
 
     @Test
     public void testFindSorted() {
-        Assertions.assertNotNull(giftCertificateDao.findSorted("name", 3, 0));
+        SortDataDto sortDataDto = new SortDataDto();
+        sortDataDto.setSortingParameter("name");
+        sortDataDto.setDescending(true);
+        sortDataDto.setLimit(3);
+        sortDataDto.setOffset(0);
+        Assertions.assertNotNull(giftCertificateDao.findSorted(sortDataDto));
     }
 
     @Test

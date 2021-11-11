@@ -47,8 +47,8 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<Tag> findAll(Integer page) throws IllegalPageNumberException {
-        return tagDao.findAll(PaginationLogics.DEFAULT_LIMIT, PaginationLogics.convertToOffset(page));
+    public List<Tag> findAll(Integer page, Integer itemCount) throws IllegalPageNumberException {
+        return tagDao.findAll(itemCount, PaginationLogics.convertToOffset(page, itemCount));
     }
 
     @Override

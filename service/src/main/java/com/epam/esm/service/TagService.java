@@ -31,7 +31,7 @@ public interface TagService extends BaseService<Tag> {
      * @param certificateId - certificate identifier to bind to
      * @return boolean result of operation
      * @throws {@link ParameterNotPresentException}
-     *                DataNotFoundException
+     * @throws {@link DataNotFoundException}
      */
     boolean addTagToCertificate(Tag tag, Long certificateId) throws ParameterNotPresentException, DataNotFoundException;
 

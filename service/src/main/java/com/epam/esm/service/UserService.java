@@ -27,13 +27,14 @@ public interface UserService extends BaseService<User> {
     /**
      * Method with all user orders seeking logics.
      *
-     * @param userId - required user identifier
-     * @param page   - required page number with data
+     * @param userId    - required user identifier
+     * @param page      - required page number with data
+     * @param itemCount - required items amount at the page
      * @return list of {@link Order} matching search condition
      * @throws {@link ParameterNotPresentException}
      * @throws {@link IllegalPageNumberException} when page number is invalid
      */
-    List<Order> findUserOrders(Long userId, Integer page)
+    List<Order> findUserOrders(Long userId, Integer page, Integer itemCount)
             throws ParameterNotPresentException, IllegalPageNumberException;
 
 }

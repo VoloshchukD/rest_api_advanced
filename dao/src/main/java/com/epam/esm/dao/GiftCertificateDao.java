@@ -2,6 +2,7 @@ package com.epam.esm.dao;
 
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
+import com.epam.esm.entity.dto.SortDataDto;
 
 import java.util.List;
 
@@ -13,8 +14,8 @@ public interface GiftCertificateDao extends BaseDao<GiftCertificate> {
 
     List<GiftCertificate> findCertificatesByTags(Integer limit, Integer offset, String... tagNames);
 
-    List<GiftCertificate> findByNameAndDescription(String name, String description, Integer limit, Integer offset);
+    List<GiftCertificate> findByNameAndDescription(GiftCertificate certificate, Integer limit, Integer offset);
 
-    List<GiftCertificate> findSorted(String sortingParameter, Integer limit, Integer offset);
+    List<GiftCertificate> findSorted(SortDataDto sortData);
 
 }

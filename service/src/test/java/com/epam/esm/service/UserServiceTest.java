@@ -50,7 +50,7 @@ public class UserServiceTest {
     @Test
     public void testFindAllUser() throws IllegalPageNumberException {
         Mockito.when(userDao.findAll(5, 0)).thenReturn(Collections.singletonList(user));
-        Assertions.assertNotNull(userService.findAll(1));
+        Assertions.assertNotNull(userService.findAll(1, 5));
     }
 
     @Test
@@ -62,7 +62,7 @@ public class UserServiceTest {
     @Test
     public void testFindUserOrders() throws ParameterNotPresentException, IllegalPageNumberException {
         Mockito.when(userDao.findUserOrders(1L, 5, 0)).thenReturn(Collections.singletonList(order));
-        Assertions.assertNotNull(userService.findUserOrders(1L, 1));
+        Assertions.assertNotNull(userService.findUserOrders(1L, 1, 5));
     }
 
 }

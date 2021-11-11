@@ -34,10 +34,12 @@ public class TagController {
         return tagModelAssembler.toModel(tag);
     }
 
-    @GetMapping(params = {"page"})
+    @GetMapping(params = {"page", "item-count"})
     @ResponseStatus(HttpStatus.OK)
-    public List<EntityModel<Tag>> findTags(@RequestParam("page") Integer page) throws IllegalPageNumberException {
-        List<Tag> tags = tagService.findAll(page);
+    public List<EntityModel<Tag>> findTags(@RequestParam("page") Integer page,
+                                           @RequestParam("item-count") Integer itemCount)
+            throws IllegalPageNumberException {
+        List<Tag> tags = tagService.findAll(page, itemCount);
         return tagModelAssembler.toCollectionModel(tags);
     }
 

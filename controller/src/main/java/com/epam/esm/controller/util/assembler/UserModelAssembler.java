@@ -3,6 +3,7 @@ package com.epam.esm.controller.util.assembler;
 import com.epam.esm.controller.TagController;
 import com.epam.esm.controller.UserController;
 import com.epam.esm.entity.User;
+import com.epam.esm.service.util.PaginationLogics;
 import lombok.SneakyThrows;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
@@ -17,8 +18,6 @@ public class UserModelAssembler implements RepresentationModelAssembler<User, En
 
     private static final String USER_RELATION_NAME = "user";
 
-    private static final Integer DEFAULT_PAGE = 1;
-
     @SneakyThrows
     @Override
     public EntityModel<User> toModel(User user) {
@@ -26,7 +25,8 @@ public class UserModelAssembler implements RepresentationModelAssembler<User, En
                 WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                         .findUser(user.getId())).withSelfRel(),
                 WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
-                        .findUserOrders(user.getId(), DEFAULT_PAGE)).withRel(USER_RELATION_NAME),
+                        .findUserOrders(user.getId(), PaginationLogics.DEFAULT_PAGE, PaginationLogics.DEFAULT_LIMIT))
+                        .withRel(USER_RELATION_NAME),
                 WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TagController.class)
                         .findPopularTag(user.getId())).withRel(USER_RELATION_NAME)
         );

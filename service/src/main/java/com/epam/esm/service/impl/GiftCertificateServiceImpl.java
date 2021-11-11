@@ -4,6 +4,7 @@ import com.epam.esm.dao.GiftCertificateDao;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
+import com.epam.esm.entity.dto.SortDataDto;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.UserService;
 import com.epam.esm.service.exception.DataNotFoundException;
@@ -13,7 +14,6 @@ import com.epam.esm.service.util.ExceptionMessageHandler;
 import com.epam.esm.service.util.PaginationLogics;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -60,15 +60,15 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificate> findAll(Integer page) throws IllegalPageNumberException {
-        return giftCertificateDao.findAll(PaginationLogics.DEFAULT_LIMIT, PaginationLogics.convertToOffset(page));
+    public List<GiftCertificate> findAll(Integer page, Integer itemCount) throws IllegalPageNumberException {
+        return giftCertificateDao.findAll(itemCount, PaginationLogics.convertToOffset(page, itemCount));
     }
 
     @Override
-    public List<GiftCertificate> findCertificatesByTags(Integer page, String... tagNames)
+    public List<GiftCertificate> findCertificatesByTags(Integer page, Integer itemCount, String... tagNames)
             throws IllegalPageNumberException {
-        return giftCertificateDao.findCertificatesByTags(PaginationLogics.DEFAULT_LIMIT,
-                PaginationLogics.convertToOffset(page), tagNames);
+        return giftCertificateDao.findCertificatesByTags(itemCount,
+                PaginationLogics.convertToOffset(page, itemCount), tagNames);
     }
 
     @Override
@@ -114,21 +114,17 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificate> findByNameAndDescription(String name, String description, Integer page)
+    public List<GiftCertificate> findByNameAndDescription(GiftCertificate certificate, Integer page, Integer itemCount)
             throws IllegalPageNumberException {
-        return giftCertificateDao.findByNameAndDescription(name, description, PaginationLogics.DEFAULT_LIMIT,
-                PaginationLogics.convertToOffset(page));
+        return giftCertificateDao.findByNameAndDescription(certificate, itemCount,
+                PaginationLogics.convertToOffset(page, itemCount));
     }
 
     @Override
-    public List<GiftCertificate> findSorted(String sortingParameter, boolean descending, Integer page)
+    public List<GiftCertificate> findSorted(SortDataDto sortData, Integer page)
             throws IllegalPageNumberException {
-        List<GiftCertificate> sortedCertificates = giftCertificateDao.findSorted(sortingParameter,
-                PaginationLogics.DEFAULT_LIMIT, PaginationLogics.convertToOffset(page));
-        if (descending) {
-            Collections.reverse(sortedCertificates);
-        }
-        return sortedCertificates;
+        sortData.setOffset(PaginationLogics.convertToOffset(page, sortData.getLimit()));
+        return giftCertificateDao.findSorted(sortData);
     }
 
 }
